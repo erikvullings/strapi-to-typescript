@@ -62,8 +62,12 @@ export class CommandLineInterface {
       header: 'Examples',
       content: [
         {
-          desc: '01. Log the css-demo topic.',
-          example: '$ kafka-topics-logger css-demo',
+          desc: '01. Convert the Strapi API folder and write the results to current folder.',
+          example: '$ sts [PATH\\TO\\API]',
+        },
+        {
+          desc: '02. Convert the Strapi API folder and write the results to output folder.',
+          example: '$ sts [PATH\\TO\\API] -o [PATH\\TO\\OUTPUT]',
         },
       ],
     },
