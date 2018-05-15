@@ -1,7 +1,4 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -9,11 +6,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const npmPackage = __importStar(require("../package.json"));
 const command_line_usage_1 = __importDefault(require("command-line-usage"));
 const command_line_args_1 = __importDefault(require("command-line-args"));
-const npmPackage = __importStar(require("../package.json"));
-const importer_1 = require("./importer");
+const processor_1 = require("./processor");
 const log = console.log;
 class CommandLineInterface {
 }
@@ -36,7 +36,7 @@ CommandLineInterface.optionDefinitions = [
     {
         name: 'output',
         alias: 'o',
-        type: Number,
+        type: String,
         typeLabel: '{underline String}',
         defaultValue: '.',
         description: 'Output folder with the TypeScript models.',
@@ -72,6 +72,6 @@ if (options.help || !options.input) {
 }
 else {
     // Do your thing
-    importer_1.importer(options.input).then((results) => results.forEach((f) => log(f)));
+    processor_1.exec(options);
 }
 //# sourceMappingURL=cli.js.map

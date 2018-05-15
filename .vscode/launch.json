@@ -10,6 +10,8 @@
       "name": "Launch Program",
       "program": "${workspaceFolder}\\src\\cli.ts",
       "args": [
+        "-o",
+        "./tmp",
         "C:\\dev\\web\\driver\\scenario-manager\\packages\\server\\api"
       ],
       "outFiles": [

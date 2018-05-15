@@ -17,49 +17,68 @@ const path = __importStar(require("path"));
  * @param filter Optional filter to specify which files to include, e.g. for json files: (f: string) => /.json$/.test(f)
  */
 const walk = (dir, done, filter) => {
-    let results = [];
+    let foundFiles = [];
     fs.readdir(dir, (err, list) => {
         if (err) {
             return done(err);
         }
         let pending = list.length;
         if (!pending) {
-            return done(null, results);
+            return done(null, foundFiles);
         }
         list.forEach((file) => {
             file = path.resolve(dir, file);
-            fs.stat(file, (err2, stat) => {
+            // tslint:disable-next-line:variable-name
+            fs.stat(file, (_err2, stat) => {
                 if (stat && stat.isDirectory()) {
-                    walk(file, (err3, res) => {
+                    walk(file, 
+                    // tslint:disable-next-line:variable-name
+                    (_err3, res) => {
                         if (res) {
-                            results = results.concat(res);
+                            foundFiles = foundFiles.concat(res);
                         }
                         if (!--pending) {
-                            done(null, results);
+                            done(null, foundFiles);
                         }
                     }, filter);
                 }
                 else {
                     if (typeof filter === 'undefined' || (filter && filter(file))) {
-                        results.push(file);
+                        foundFiles.push(file);
                     }
                     if (!--pending) {
-                        done(null, results);
+                        done(null, foundFiles);
                     }
                 }
             });
         });
     });
 };
-exports.importer = (dir) => new Promise((resolve, reject) => {
+exports.findFiles = (dir) => new Promise((resolve, reject) => {
     const filter = (f) => /.settings.json$/.test(f);
-    const files = walk(dir, (err, results) => {
+    walk(dir, (err, files) => {
         if (err) {
             reject(err);
         }
-        else if (results) {
-            resolve(results);
+        else if (files) {
+            resolve(files);
         }
     }, filter);
+});
+/*
+ */
+exports.importFiles = (files) => new Promise((resolve, reject) => {
+    let pending = files.length;
+    const results = [];
+    files.forEach((f) => fs.readFile(f, { encoding: 'utf8' }, (err, data) => {
+        if (err) {
+            reject(err);
+        }
+        pending--;
+        results.push(Object.assign(JSON.parse(data), { _filename: f }));
+        if (pending === 0) {
+            resolve(results);
+        }
+    }));
 });
 //# sourceMappingURL=importer.js.map

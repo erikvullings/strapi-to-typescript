@@ -1,8 +1,8 @@
+import * as npmPackage from '../package.json';
 import commandLineUsage from 'command-line-usage';
 import commandLineArgs from 'command-line-args';
 import { OptionDefinition } from 'command-line-args';
-import * as npmPackage from '../package.json';
-import { importer } from './importer';
+import { exec } from './processor';
 
 const log = console.log;
 
@@ -40,7 +40,7 @@ export class CommandLineInterface {
     {
       name: 'output',
       alias: 'o',
-      type: Number,
+      type: String,
       typeLabel: '{underline String}',
       defaultValue: '.',
       description: 'Output folder with the TypeScript models.',
@@ -78,5 +78,5 @@ if (options.help || !options.input) {
   process.exit(0);
 } else {
   // Do your thing
-  importer(options.input).then((results) => results.forEach((f) => log(f)));
+  exec(options);
 }

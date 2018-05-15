@@ -59,3 +59,7 @@ typings/
 
 # next.js build output
 .next
+
+# This repo
+tmp
+dist
