@@ -4,7 +4,7 @@
   "description": "Convert the strapi models to typescript interfaces.",
   "main": "index.js",
   "bin": {
-    "sts": "run.js"
+    "sts": "./bin/run.js"
   },
   "scripts": {
     "start": "tsc -w",
