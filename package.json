@@ -1,0 +1,37 @@
+{
+  "name": "strapi-to-typescript",
+  "version": "0.0.1",
+  "description": "Convert the strapi models to typescript.",
+  "main": "index.js",
+  "bin": {
+    "strapi-to-typescript": "run.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erikvullings/strapi-to-typescript.git"
+  },
+  "keywords": [
+    "Strapi",
+    "TypeScript",
+    "model",
+    "generator"
+  ],
+  "author": "Erik Vullings <erik.vullings@gmail.com> (http://www.tno.nl)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/erikvullings/strapi-to-typescript/issues"
+  },
+  "homepage": "https://github.com/erikvullings/strapi-to-typescript#readme",
+  "dependencies": {
+    "command-line-args": "^5.0.2",
+    "command-line-usage": "^5.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^10.0.9",
+    "@types/command-line-args": "^5.0.0",
+    "@types/command-line-usage": "^5.0.1"
+  }
+}
