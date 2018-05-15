@@ -1,10 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import {
-  IStrapiModel,
-  StrapiType,
-  IStrapiModelAttribute,
-} from './models/strapi-model';
+import { IStrapiModel, StrapiType, IStrapiModelAttribute } from './models/strapi-model';
 
 /**
  * Convert a camelCase name to a TypeScript interface name, e.g.
@@ -12,8 +8,18 @@ import {
  *
  * @param name camelCase name
  */
-const toInterfaceName = (name: string) =>
-  `I${name.replace(/^./, (str: string) => str.toUpperCase())}`;
+const toInterfaceName = (name: string) => `I${name.replace(/^./, (str: string) => str.toUpperCase())}`;
+
+/**
+ * Convert name to snake name, e.g. camelCase => camel-case
+ *
+ * @param name input name
+ */
+export const toSnakeName = (name: string) =>
+  name
+    .split(/(?=[A-Z])/)
+    .join('-')
+    .toLowerCase();
 
 /**
  * Convert a Strapi type to a TypeScript type.
@@ -21,39 +27,59 @@ const toInterfaceName = (name: string) =>
  * @param propType Strapi type
  */
 const toPropertyType = (propType: StrapiType) =>
-  propType === 'text' || propType === 'email'
-    ? 'string'
-    : propType === 'date'
-      ? 'Date'
-      : propType;
+  propType === 'text' || propType === 'email' ? 'string' : propType === 'date' ? 'Date' : propType;
 
 /**
  * Convert a Strapi Attribute to a TypeScript property.
  *
  * @param name Name of the property
  * @param a Attributes of the property
+ * @param structure Overall output structure
  */
-const strapiModelAttributeToProperty = (
-  name: string,
-  a: IStrapiModelAttribute
-) => {
+const strapiModelAttributeToProperty = (name: string, a: IStrapiModelAttribute, structure: Array<{
+  name: string;
+  folder: string;
+  snakeName: string;
+  m: IStrapiModel;
+}>) => {
+  const findModelName = (n: string) => {
+    const result = structure.filter((s) => s.name.toLowerCase() === n).shift();
+    return result ? result.name : '';
+  };
   const required = a.required ? '' : '?';
   const collection = a.collection ? '[]' : '';
   const propType = a.collection
-    ? toInterfaceName(a.collection)
+    ? toInterfaceName(findModelName(a.collection))
     : a.model
       ? a.model === 'file'
         ? 'Blob'
-        : toInterfaceName(a.model)
+        : toInterfaceName(findModelName(a.model))
       : a.type
         ? toPropertyType(a.type)
         : 'unknown';
   return `${name}${required}: ${propType}${collection};`;
 };
 
-const strapiModelExtractImports = (m: IStrapiModel) => {
-  const onlyUnique = <T>(value: T, index: number, self: T[]) =>
-    self.indexOf(value) === index;
+/**
+ * Find all required models and import them.
+ *
+ * @param m Strapi model to examine
+ * @param structure Overall output structure
+ */
+const strapiModelExtractImports = (
+  m: IStrapiModel,
+  structure: Array<{
+    name: string;
+    folder: string;
+    snakeName: string;
+    m: IStrapiModel;
+  }>
+) => {
+  const isUnique = <T>(value: T, index: number, arr: T[]) => arr.indexOf(value) === index;
+  const toImportDefinition = (name: string) => {
+    const found = structure.filter((s) => s.name.toLowerCase() === name).shift();
+    return found ? `import { ${toInterfaceName(found.name)} } from '../${found.snakeName}/${found.snakeName}';` : '';
+  };
 
   const imports: string[] = [];
   if (m.attributes) {
@@ -62,11 +88,13 @@ const strapiModelExtractImports = (m: IStrapiModel) => {
         continue;
       }
       const a = m.attributes[aName];
-      if (a.collection) {
-        imports.push(a.collection);
-      }
-      if (a.model && a.model !== 'file') {
-        imports.push(a.model);
+      const proposedImport = a.collection
+        ? toImportDefinition(a.collection)
+        : a.model && a.model !== 'file'
+          ? toImportDefinition(a.model)
+          : '';
+      if (proposedImport) {
+        imports.push(proposedImport);
       }
     }
   }
@@ -74,17 +102,24 @@ const strapiModelExtractImports = (m: IStrapiModel) => {
     return '';
   }
   return imports
-    .filter(onlyUnique)
+    .filter(isUnique)
     .sort()
-    .map((i) => `import ${toInterfaceName(i)} from '../${i}/${i}';`)
     .join('\n');
 };
 
-const strapiModelToInterface = (m: IStrapiModel) => {
+const strapiModelToInterface = (
+  m: IStrapiModel,
+  structure: Array<{
+    name: string;
+    folder: string;
+    snakeName: string;
+    m: IStrapiModel;
+  }>
+) => {
   const name = m.info.name;
   const interfaceName = toInterfaceName(name);
   const result: string[] = [];
-  const imports = strapiModelExtractImports(m);
+  const imports = strapiModelExtractImports(m, structure);
   if (imports) {
     result.push(imports + '\n');
   }
@@ -98,9 +133,7 @@ const strapiModelToInterface = (m: IStrapiModel) => {
       if (!m.attributes.hasOwnProperty(aName)) {
         continue;
       }
-      result.push(
-        `  ${strapiModelAttributeToProperty(aName, m.attributes[aName])}`
-      );
+      result.push(`  ${strapiModelAttributeToProperty(aName, m.attributes[aName], structure)}`);
     }
   }
   result.push('}\n');
@@ -116,30 +149,26 @@ export const convert = (outputFolder: string, strapiModels: IStrapiModel[]) =>
     if (!fs.existsSync(outputFolder)) {
       fs.mkdirSync(outputFolder);
     }
-    strapiModels.forEach((m) => {
+    const structure = strapiModels.map((m) => {
       const name = m.info.name;
-      const snakeName = name
-        .split(/(?=[A-Z])/)
-        .join('-')
-        .toLowerCase();
-      const folder = path.resolve(outputFolder, name);
+      const snakeName = toSnakeName(name);
+      const folder = path.resolve(outputFolder, snakeName);
       if (!fs.existsSync(folder)) {
         fs.mkdirSync(folder);
       }
+      return { name, folder, snakeName, m };
+    });
+    structure.forEach((g) => {
+      const { folder, snakeName, m } = g;
       const outputFile = path.resolve(folder, `${snakeName}.ts`);
-      fs.writeFile(
-        outputFile,
-        strapiModelToInterface(m),
-        { encoding: 'utf8' },
-        (err) => {
-          count--;
-          if (err) {
-            reject(err);
-          }
-          if (count === 0) {
-            resolve(strapiModels.length);
-          }
+      fs.writeFile(outputFile, strapiModelToInterface(m, structure), { encoding: 'utf8' }, (err) => {
+        count--;
+        if (err) {
+          reject(err);
         }
-      );
+        if (count === 0) {
+          resolve(strapiModels.length);
+        }
+      });
     });
   });
