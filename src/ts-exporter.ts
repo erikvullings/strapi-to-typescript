@@ -140,6 +140,17 @@ const strapiModelToInterface = (
   return result.join('\n');
 };
 
+const writeIndex = (folder: string, structure: Array<{
+  name: string;
+  folder: string;
+  snakeName: string;
+  m: IStrapiModel;
+}>) => {
+  const outputFile = path.resolve(folder, 'index.ts');
+  const output = structure.map((s) => `export * from './${s.snakeName}/${s.snakeName}';`).join('\n');
+  fs.writeFileSync(outputFile, output + '\n');
+};
+
 /**
  * Export a StrapiModel to a TypeScript interface
  */
@@ -158,6 +169,7 @@ export const convert = (outputFolder: string, strapiModels: IStrapiModel[]) =>
       }
       return { name, folder, snakeName, m };
     });
+    writeIndex(outputFolder, structure);
     structure.forEach((g) => {
       const { folder, snakeName, m } = g;
       const outputFile = path.resolve(folder, `${snakeName}.ts`);
