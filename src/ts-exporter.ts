@@ -2,6 +2,14 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { IStrapiModel, StrapiType, IStrapiModelAttribute } from './models/strapi-model';
 
+interface IStructure {
+  name: string;
+  folder: string;
+  snakeName: string;
+  m: IStrapiModel;
+  nested: boolean;
+}
+
 /**
  * Convert a camelCase name to a TypeScript interface name, e.g.
  * camelCase => ICamelCase.
@@ -88,19 +96,12 @@ const strapiModelAttributeToProperty = (
  * @param m Strapi model to examine
  * @param structure Overall output structure
  */
-const strapiModelExtractImports = (
-  m: IStrapiModel,
-  structure: Array<{
-    name: string;
-    folder: string;
-    snakeName: string;
-    m: IStrapiModel;
-  }>
-) => {
+const strapiModelExtractImports = (m: IStrapiModel, structure: IStructure[]) => {
   const isUnique = <T>(value: T, index: number, arr: T[]) => arr.indexOf(value) === index;
   const toImportDefinition = (name: string) => {
     const found = structure.filter((s) => s.name.toLowerCase() === name).shift();
-    return found ? `import { ${toInterfaceName(found.name)} } from '../${found.snakeName}/${found.snakeName}';` : '';
+    const toFolder = (f: IStructure) => (f.nested ? `../${f.snakeName}/${f.snakeName}` : `./${f.snakeName}`);
+    return found ? `import { ${toInterfaceName(found.name)} } from '${toFolder(found)}';` : '';
   };
 
   const imports: string[] = [];
@@ -129,15 +130,7 @@ const strapiModelExtractImports = (
     .join('\n');
 };
 
-const strapiModelToInterface = (
-  m: IStrapiModel,
-  structure: Array<{
-    name: string;
-    folder: string;
-    snakeName: string;
-    m: IStrapiModel;
-  }>
-) => {
+const strapiModelToInterface = (m: IStrapiModel, structure: IStructure[]) => {
   const name = m.info.name;
   const interfaceName = toInterfaceName(name);
   const result: string[] = [];
@@ -162,24 +155,18 @@ const strapiModelToInterface = (
   return result.join('\n');
 };
 
-const writeIndex = (
-  folder: string,
-  structure: Array<{
-    name: string;
-    folder: string;
-    snakeName: string;
-    m: IStrapiModel;
-  }>
-) => {
+const writeIndex = (folder: string, structure: IStructure[]) => {
   const outputFile = path.resolve(folder, 'index.ts');
-  const output = structure.map((s) => `export * from './${s.snakeName}/${s.snakeName}';`).join('\n');
+  const output = structure
+    .map((s) => (s.nested ? `export * from './${s.snakeName}/${s.snakeName}';` : `export * from './${s.snakeName}';`))
+    .join('\n');
   fs.writeFileSync(outputFile, output + '\n');
 };
 
 /**
  * Export a StrapiModel to a TypeScript interface
  */
-export const convert = (outputFolder: string, strapiModels: IStrapiModel[]) =>
+export const convert = (outputFolder: string, strapiModels: IStrapiModel[], nested = false) =>
   new Promise<number>((resolve, reject) => {
     let count = strapiModels.length;
     if (!fs.existsSync(outputFolder)) {
@@ -188,11 +175,11 @@ export const convert = (outputFolder: string, strapiModels: IStrapiModel[]) =>
     const structure = strapiModels.map((m) => {
       const name = m.info.name;
       const snakeName = toSnakeName(name);
-      const folder = path.resolve(outputFolder, snakeName);
+      const folder = nested ? path.resolve(outputFolder, snakeName) : outputFolder;
       if (!fs.existsSync(folder)) {
         fs.mkdirSync(folder);
       }
-      return { name, folder, snakeName, m };
+      return { name, folder, snakeName, m, nested };
     });
     writeIndex(outputFolder, structure);
     structure.forEach((g) => {

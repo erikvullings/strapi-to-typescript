@@ -11,6 +11,8 @@ export interface ICommandOptions {
   input: string;
   /** Output folder */
   output: string;
+  /** Put all interfaces in a nested tree instead of directly under the output folder */
+  nested: boolean;
   /** Display help output */
   help: boolean;
 }
@@ -45,6 +47,14 @@ export class CommandLineInterface {
       defaultValue: '.',
       description: 'Output folder with the TypeScript models.',
     },
+    {
+      name: 'nested',
+      alias: 'n',
+      type: Boolean,
+      typeLabel: '{underline Boolean}',
+      defaultValue: false,
+      description: 'If true, add each interface in its own folder.',
+    },
   ];
 
   public static sections = [
@@ -68,6 +78,10 @@ export class CommandLineInterface {
         {
           desc: '02. Convert the Strapi API folder and write the results to output folder.',
           example: '$ sts [PATH\\TO\\API] -o [PATH\\TO\\OUTPUT]',
+        },
+        {
+          desc: '03. Add each interface to its own folder.',
+          example: '$ sts [PATH\\TO\\API] -o [PATH\\TO\\OUTPUT] -n',
         },
       ],
     },
