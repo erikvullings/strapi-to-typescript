@@ -26,8 +26,26 @@ export const toSnakeName = (name: string) =>
  *
  * @param propType Strapi type
  */
-const toPropertyType = (propType: StrapiType) =>
-  propType === 'text' || propType === 'email' ? 'string' : propType === 'date' ? 'Date' : propType;
+const toPropertyType = (propType: StrapiType) => {
+  const pt = propType.toLowerCase();
+  switch (pt) {
+    case 'text':
+    case 'email':
+    case 'password':
+      return 'string';
+    case 'date':
+      return 'Date';
+    case 'media':
+      return 'Blob';
+    case 'json':
+      return '{ [key: string]: any }';
+    case 'string':
+    case 'number':
+    case 'boolean':
+    default:
+      return pt;
+  }
+};
 
 /**
  * Convert a Strapi Attribute to a TypeScript property.
@@ -36,12 +54,16 @@ const toPropertyType = (propType: StrapiType) =>
  * @param a Attributes of the property
  * @param structure Overall output structure
  */
-const strapiModelAttributeToProperty = (name: string, a: IStrapiModelAttribute, structure: Array<{
-  name: string;
-  folder: string;
-  snakeName: string;
-  m: IStrapiModel;
-}>) => {
+const strapiModelAttributeToProperty = (
+  name: string,
+  a: IStrapiModelAttribute,
+  structure: Array<{
+    name: string;
+    folder: string;
+    snakeName: string;
+    m: IStrapiModel;
+  }>
+) => {
   const findModelName = (n: string) => {
     const result = structure.filter((s) => s.name.toLowerCase() === n).shift();
     return result ? result.name : '';
@@ -140,12 +162,15 @@ const strapiModelToInterface = (
   return result.join('\n');
 };
 
-const writeIndex = (folder: string, structure: Array<{
-  name: string;
-  folder: string;
-  snakeName: string;
-  m: IStrapiModel;
-}>) => {
+const writeIndex = (
+  folder: string,
+  structure: Array<{
+    name: string;
+    folder: string;
+    snakeName: string;
+    m: IStrapiModel;
+  }>
+) => {
   const outputFile = path.resolve(folder, 'index.ts');
   const output = structure.map((s) => `export * from './${s.snakeName}/${s.snakeName}';`).join('\n');
   fs.writeFileSync(outputFile, output + '\n');
