@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { IStrapiModel, StrapiType, IStrapiModelAttribute } from './models/strapi-model';
+import { IStrapiModel, IStrapiModelAttribute } from './models/strapi-model';
 
 interface IStructure {
   name: string;
@@ -34,13 +34,15 @@ export const toSnakeName = (name: string) =>
  *
  * @param propType Strapi type
  */
-const toPropertyType = (propType: StrapiType) => {
-  const pt = propType.toLowerCase();
+const toPropertyType = (model: IStrapiModelAttribute) => {
+  const pt = model.type ? model.type.toLowerCase() : "any";
   switch (pt) {
     case 'text':
     case 'email':
     case 'password':
       return 'string';
+    case 'enumeration':
+      return model.enum ? `"${model.enum.join(`" | "`)}"` : "string";
     case 'date':
       return 'Date';
     case 'media':
@@ -85,7 +87,7 @@ const strapiModelAttributeToProperty = (
         ? 'Blob'
         : toInterfaceName(findModelName(a.model))
       : a.type
-        ? toPropertyType(a.type)
+        ? toPropertyType(a)
         : 'unknown';
   return `${name}${required}: ${propType}${collection};`;
 };
