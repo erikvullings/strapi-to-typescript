@@ -70,6 +70,28 @@ export const findFiles = (dir: string) =>
     );
   });
 
+
+/**
+ * Wrapper around "findFiles".
+ * 
+ */
+export
+  async function findFilesFromMultipleDirectories(...files:string[]): Promise<string[]> {
+  const inputs = [... new Set(files)]
+
+  var actions = inputs.map(i => findFiles(i)); // run the function over all items
+
+  // we now have a promises array and we want to wait for it
+
+  var results = await Promise.all(actions); // pass array of promises
+
+  // flatten
+  return (new Array<string>()).concat.apply([], results)
+}
+
+
+
+
 /*
  */
 

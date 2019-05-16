@@ -7,8 +7,8 @@ import { exec } from './processor';
 const log = console.log;
 
 export interface ICommandOptions {
-  /** Strapi folder with models */
-  input: string;
+  /** Strapi folder(s) with models */
+  input: string[];
   /** Output folder */
   output: string;
   /** Put all interfaces in a nested tree instead of directly under the output folder */
@@ -35,6 +35,7 @@ export class CommandLineInterface {
       name: 'input',
       alias: 'i',
       type: String,
+      multiple:true,
       typeLabel: '{underline String}',
       defaultOption: true,
       description: 'Input folder with the Strapi models (api folder).',
@@ -82,6 +83,10 @@ export class CommandLineInterface {
         {
           desc: '03. Add each interface to its own folder.',
           example: '$ sts [PATH\\TO\\API] -o [PATH\\TO\\OUTPUT] -n',
+        },
+        {
+          desc: '04. Define multiple input folders.',
+          example: '$ sts [PATH\\TO\\API] [PATH\\TO\\Plugin] [PATH\\TO\\Another_Plugin]',
         },
       ],
     },

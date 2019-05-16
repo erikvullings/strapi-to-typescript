@@ -9,6 +9,13 @@ npm install -g strapi-to-typescript
 sts path/to/strapi/api/ -o path/to/your/types/dir/
 ```
 
+You may define multiple inputs. In case your API models have relations to other plugins like 'users-permissions'.
+
+```console
+sts path/to/strapi/api/ path/to/strapi/plugins/users-permissions/models -o path/to/your/types/dir/
+```
+
+
 # Build
 
 ```console
