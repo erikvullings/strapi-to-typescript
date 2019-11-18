@@ -49,6 +49,10 @@ const toPropertyType = (model: IStrapiModelAttribute) => {
       return 'Blob';
     case 'json':
       return '{ [key: string]: any }';
+    case 'decimal':
+    case 'float':
+    case 'biginteger':
+        return 'number';
     case 'string':
     case 'number':
     case 'boolean':
