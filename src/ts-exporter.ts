@@ -96,10 +96,9 @@ const strapiModelAttributeToProperty = (
     }
     return result ? result.name : '';
   };
-  const required = a.required ? '' : '?';
+  const required = !a.required && !(a.collection || a.repeatable)  ? '?' : '';
   a = groupCompatible(a);
   const collection = a.collection ? '[]' : '';
-
 
   const propType = a.collection
     ? toInterfaceName(findModelName(a.collection))
