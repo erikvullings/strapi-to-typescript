@@ -11,7 +11,7 @@ export const exec = async (options: ICommandOptions) => {
     files.push(... await findFiles(options.inputGroup, /.json/));
   }
   const strapiModels = await importFiles(files);
-  convert(options.output, strapiModels, options.nested)
+  convert(options.output, strapiModels, options.nested, options.enum)
     .then((count) => {
       log(`Generated ${count} interfaces.`);
       process.exit(0);

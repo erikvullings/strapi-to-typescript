@@ -11,14 +11,37 @@ sts path/to/strapi/api/ -o path/to/your/types/dir/
 
 You may define multiple inputs. In case your API models have relations to other plugins like 'users-permissions'.
 
-```console
+```sh
 sts path/to/strapi/api/ path/to/strapi/plugins/users-permissions/models -o path/to/your/types/dir/
 ```
 
+## Enumeration
+You may generate **enumeration** or **string literal** with option **-e**
+
+```sh
+sts ./api ./extensions/users-permissions/models/ -e -g ./components/ -o path/to/your/types/dir/
+```
+
+Example:
+```js
+// enumeration (with -e option) 
+export interface IOrder {
+  payment: IOrderPayment;
+}
+
+export enum IOrderPayment {
+  card = "card",
+  check = "check",
+}
+// OR string literal types (by default)
+export interface IOrder {
+  payment: "card" | "check";
+}
+```
 
 # Build
 
-```console
+```sh
 npm i
 npm run build
 ```
