@@ -15,7 +15,7 @@ const walk = (
   filter?: (f: string) => boolean
 ) => {
   let foundFiles: string[] = [];
-  fs.readdir(dir, (err: Error, list: string[]) => {
+  fs.readdir(dir, (err: NodeJS.ErrnoException | null, list: string[]) => {
     if (err) {
       return done(err);
     }

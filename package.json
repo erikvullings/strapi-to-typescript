@@ -1,6 +1,6 @@
 {
   "name": "strapi-to-typescript",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "Convert the strapi models to typescript interfaces.",
   "main": "index.js",
   "bin": {
@@ -24,19 +24,22 @@
     "generator"
   ],
   "author": "Erik Vullings <erik.vullings@gmail.com> (http://www.tno.nl)",
+  "contributors": [
+    "Anthony Perron <perron.anthony@gmail.com> (http://anthonyperron.fr)"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/erikvullings/strapi-to-typescript/issues"
   },
   "homepage": "https://github.com/erikvullings/strapi-to-typescript#readme",
   "dependencies": {
-    "command-line-args": "^5.0.2",
+    "command-line-args": "^5.1.1",
     "command-line-usage": "^5.0.5"
   },
   "devDependencies": {
-    "typescript": "^2.8.3",
-    "@types/node": "^10.0.9",
     "@types/command-line-args": "^5.0.0",
-    "@types/command-line-usage": "^5.0.1"
+    "@types/command-line-usage": "^5.0.1",
+    "@types/node": "^10.17.17",
+    "typescript": "^2.8.3"
   }
 }
