@@ -8,8 +8,9 @@
   },
   "scripts": {
     "start": "tsc -w",
-    "patch-release": "npm version patch && npm publish && git push --follow-tags",
-    "minor-release": "npm version minor && npm publish && git push --follow-tags",
+    "build": "tsc",
+    "patch-release": "npm version patch && tsc && npm publish && git push --follow-tags",
+    "minor-release": "npm version minor && tsc && npm publish && git push --follow-tags",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

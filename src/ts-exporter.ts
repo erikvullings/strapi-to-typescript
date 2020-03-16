@@ -52,6 +52,7 @@ const toPropertyType = (model: IStrapiModelAttribute) => {
     case 'decimal':
     case 'float':
     case 'biginteger':
+    case 'integer':
         return 'number';
     case 'string':
     case 'number':
@@ -67,8 +68,8 @@ const toPropertyType = (model: IStrapiModelAttribute) => {
  * @param attr IStrapiModelAttribute
  */
 const groupCompatible = (attr: IStrapiModelAttribute) => {
-  return (attr.type === 'group')
-    ? attr.repeatable ? { collection: attr.group } : { model: attr.group }
+  return (attr.type === 'component')
+    ? attr.repeatable ? { collection: attr.component!.split('.')[1] } : { model: attr.component!.split('.')[1] }
     : attr;
 }
 /**

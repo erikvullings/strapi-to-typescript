@@ -20,7 +20,7 @@ sts path/to/strapi/api/ path/to/strapi/plugins/users-permissions/models -o path/
 
 ```console
 npm i
-npm run start
+npm run build
 ```
 
 ## Explanation

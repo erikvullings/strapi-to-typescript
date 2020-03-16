@@ -1,4 +1,4 @@
-export type StrapiType = 'string' | 'number' | 'boolean' | 'text' | 'date' | 'email' | 'group';
+export type StrapiType = 'string' | 'number' | 'boolean' | 'text' | 'date' | 'email' | 'component';
 
 export interface IStrapiModelAttribute {
   unique?: boolean;
@@ -11,7 +11,7 @@ export interface IStrapiModelAttribute {
   via?: string;
   plugin?: string;
   enum?: string[];
-  group?: string;
+  component?: string;
   repeatable?: boolean;
 }
 
