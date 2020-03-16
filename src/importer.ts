@@ -54,9 +54,9 @@ const walk = (
   });
 };
 
-export const findFiles = (dir: string) =>
+export const findFiles = (dir: string, ext: RegExp = /.settings.json$/ ) =>
   new Promise<string[]>((resolve, reject) => {
-    const filter = (f: string) => /.settings.json$/.test(f);
+    const filter = (f: string) => ext.test(f);
     walk(
       dir,
       (err, files) => {

@@ -16,7 +16,7 @@ interface IStructure {
  *
  * @param name camelCase name
  */
-const toInterfaceName = (name: string) => `I${name.replace(/^./, (str: string) => str.toUpperCase())}`;
+const toInterfaceName = (name: string) => name ? `I${name.replace(/^./, (str: string) => str.toUpperCase())}` : 'any';
 
 /**
  * Convert name to snake name, e.g. camelCase => camel-case
@@ -62,6 +62,16 @@ const toPropertyType = (model: IStrapiModelAttribute) => {
 };
 
 /**
+ * Transform a Strapi Attribute of group.
+ *
+ * @param attr IStrapiModelAttribute
+ */
+const groupCompatible = (attr: IStrapiModelAttribute) => {
+  return (attr.type === 'group')
+    ? attr.repeatable ? { collection: attr.group } : { model: attr.group }
+    : attr;
+}
+/**
  * Convert a Strapi Attribute to a TypeScript property.
  *
  * @param name Name of the property
@@ -80,10 +90,16 @@ const strapiModelAttributeToProperty = (
 ) => {
   const findModelName = (n: string) => {
     const result = structure.filter((s) => s.name.toLowerCase() === n).shift();
+    if (!result){
+      console.log(`WARNING - Model ${n} is unknown => Use any.`)
+    }
     return result ? result.name : '';
   };
   const required = a.required ? '' : '?';
+  a = groupCompatible(a);
   const collection = a.collection ? '[]' : '';
+
+
   const propType = a.collection
     ? toInterfaceName(findModelName(a.collection))
     : a.model
@@ -116,7 +132,8 @@ const strapiModelExtractImports = (m: IStrapiModel, structure: IStructure[]) => 
       if (!m.attributes.hasOwnProperty(aName)) {
         continue;
       }
-      const a = m.attributes[aName];
+      const a = groupCompatible(m.attributes[aName]);
+
       const proposedImport = a.collection
         ? toImportDefinition(a.collection)
         : a.model && a.model !== 'file'

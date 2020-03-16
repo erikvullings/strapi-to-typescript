@@ -9,6 +9,8 @@ const log = console.log;
 export interface ICommandOptions {
   /** Strapi folder(s) with models */
   input: string[];
+  /** Strapi folder(s) with groups models */
+  inputGroup: string;
   /** Output folder */
   output: string;
   /** Put all interfaces in a nested tree instead of directly under the output folder */
@@ -39,6 +41,14 @@ export class CommandLineInterface {
       typeLabel: '{underline String}',
       defaultOption: true,
       description: 'Input folder with the Strapi models (api folder).',
+    },
+    {
+      name: 'inputGroup',
+      alias: 'g',
+      type: String,
+      typeLabel: '{underline String}',
+      defaultValue: undefined,
+      description: 'Input folder with the Strapi models (groups folder).',
     },
     {
       name: 'output',
