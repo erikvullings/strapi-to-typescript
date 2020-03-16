@@ -10,6 +10,7 @@ export interface IStrapiModelAttribute {
   model?: string;
   via?: string;
   plugin?: string;
+  enum?: string[];
 }
 
 export interface IStrapiModel {

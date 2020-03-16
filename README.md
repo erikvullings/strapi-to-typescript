@@ -2,6 +2,13 @@
 
 Convert the Strapi models to TypeScript interfaces by processing each of the `./api/**/models/*.settings.json` recursively.
 
+# Install and Run
+
+```console
+npm install -g strapi-to-typescript
+sts path/to/strapi/api/ -o path/to/your/types/dir/
+```
+
 # Build
 
 ```console
