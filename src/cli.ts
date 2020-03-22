@@ -9,10 +9,14 @@ const log = console.log;
 export interface ICommandOptions {
   /** Strapi folder(s) with models */
   input: string[];
+  /** Strapi folder(s) with groups models */
+  inputGroup: string;
   /** Output folder */
   output: string;
   /** Put all interfaces in a nested tree instead of directly under the output folder */
   nested: boolean;
+  /** Generate enumeration */
+  enum: boolean;
   /** Display help output */
   help: boolean;
 }
@@ -41,6 +45,14 @@ export class CommandLineInterface {
       description: 'Input folder with the Strapi models (api folder).',
     },
     {
+      name: 'inputGroup',
+      alias: 'g',
+      type: String,
+      typeLabel: '{underline String}',
+      defaultValue: undefined,
+      description: 'Input folder with the Strapi models (groups folder).',
+    },
+    {
       name: 'output',
       alias: 'o',
       type: String,
@@ -55,6 +67,14 @@ export class CommandLineInterface {
       typeLabel: '{underline Boolean}',
       defaultValue: false,
       description: 'If true, add each interface in its own folder.',
+    },
+    {
+      name: 'enum',
+      alias: 'e',
+      type: Boolean,
+      typeLabel: '{underline Boolean}',
+      defaultValue: false,
+      description: 'If true, Enumeration is generate, else string literal types is used',
     },
   ];
 

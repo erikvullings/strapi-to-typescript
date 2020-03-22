@@ -16,7 +16,16 @@ interface IStructure {
  *
  * @param name camelCase name
  */
-const toInterfaceName = (name: string) => `I${name.replace(/^./, (str: string) => str.toUpperCase())}`;
+const toInterfaceName = (name: string) => name ? `I${name.replace(/^./, (str: string) => str.toUpperCase())}` : 'any';
+
+/**
+ * Convert a name to a Pascal case name
+ * pascalCase => PascalCase.
+ *
+ * @param name name
+ */
+const toPascalCase = (name: string) => name ? `${name.replace(/^./, (str: string) => str.toUpperCase())}` : 'any';
+
 
 /**
  * Convert name to snake name, e.g. camelCase => camel-case
@@ -32,9 +41,12 @@ export const toSnakeName = (name: string) =>
 /**
  * Convert a Strapi type to a TypeScript type.
  *
- * @param propType Strapi type
+ * @param interfaceName name of current interface
+ * @param fieldName name of the field
+ * @param model Strapi type
+ * @param enumm Use Enum type (or string literal types)
  */
-const toPropertyType = (model: IStrapiModelAttribute) => {
+const toPropertyType = (interfaceName: string, fieldName: string, model: IStrapiModelAttribute, enumm: boolean) => {
   const pt = model.type ? model.type.toLowerCase() : "any";
   switch (pt) {
     case 'text':
@@ -42,13 +54,22 @@ const toPropertyType = (model: IStrapiModelAttribute) => {
     case 'password':
       return 'string';
     case 'enumeration':
-      return model.enum ? `"${model.enum.join(`" | "`)}"` : "string";
+      if(enumm){
+        return model.enum ? `${interfaceName}${toPascalCase(fieldName)}` : "string";
+      } else {
+        return model.enum ? `"${model.enum.join(`" | "`)}"` : "string";
+      }
     case 'date':
       return 'Date';
     case 'media':
       return 'Blob';
     case 'json':
       return '{ [key: string]: any }';
+    case 'decimal':
+    case 'float':
+    case 'biginteger':
+    case 'integer':
+        return 'number';
     case 'string':
     case 'number':
     case 'boolean':
@@ -58,13 +79,26 @@ const toPropertyType = (model: IStrapiModelAttribute) => {
 };
 
 /**
+ * Transform a Strapi Attribute of group.
+ *
+ * @param attr IStrapiModelAttribute
+ */
+const componentCompatible = (attr: IStrapiModelAttribute) => {
+  return (attr.type === 'component')
+    ? attr.repeatable ? { collection: attr.component!.split('.')[1] } : { model: attr.component!.split('.')[1] }
+    : attr;
+}
+/**
  * Convert a Strapi Attribute to a TypeScript property.
  *
+ * @param interfaceName name of current interface
  * @param name Name of the property
  * @param a Attributes of the property
  * @param structure Overall output structure
+ * @param enumm Use Enum type (or string literal types)
  */
 const strapiModelAttributeToProperty = (
+  interfaceName: string,
   name: string,
   a: IStrapiModelAttribute,
   structure: Array<{
@@ -72,14 +106,17 @@ const strapiModelAttributeToProperty = (
     folder: string;
     snakeName: string;
     m: IStrapiModel;
-  }>
+  }>,
+  enumm: boolean
 ) => {
   const findModelName = (n: string) => {
     const result = structure.filter((s) => s.name.toLowerCase() === n).shift();
     return result ? result.name : '';
   };
-  const required = a.required ? '' : '?';
+  const required = !a.required && !(a.collection || a.repeatable)  ? '?' : '';
+  a = componentCompatible(a);
   const collection = a.collection ? '[]' : '';
+
   const propType = a.collection
     ? toInterfaceName(findModelName(a.collection))
     : a.model
@@ -87,10 +124,34 @@ const strapiModelAttributeToProperty = (
         ? 'Blob'
         : toInterfaceName(findModelName(a.model))
       : a.type
-        ? toPropertyType(a)
+        ? toPropertyType(interfaceName, name, a, enumm)
         : 'unknown';
   return `${name}${required}: ${propType}${collection};`;
 };
+
+/**
+ * Convert all Strapi Enum to TypeScript Enumeration.
+ *
+ * @param interfaceName name of current interface
+ * @param a Attributes
+ */
+const strapiModelAttributeToEnum = (interfaceName: string, attributes: { [attr: string]: IStrapiModelAttribute }): string[] => {
+  const enums: string[] = []
+  for (const aName in attributes) {
+    if (!attributes.hasOwnProperty(aName)) {
+      continue;
+    }
+    if(attributes[aName].type === 'enumeration'){
+      enums.push(`export enum ${interfaceName}${toPascalCase(aName)} {`);
+      attributes[aName].enum!.forEach( e => {
+        enums.push(`  ${e} = "${e}",`); 
+      })
+      enums.push(`}\n`);
+    }
+  }
+
+  return enums
+}
 
 /**
  * Find all required models and import them.
@@ -112,7 +173,8 @@ const strapiModelExtractImports = (m: IStrapiModel, structure: IStructure[]) => 
       if (!m.attributes.hasOwnProperty(aName)) {
         continue;
       }
-      const a = m.attributes[aName];
+      const a = componentCompatible(m.attributes[aName]);
+
       const proposedImport = a.collection
         ? toImportDefinition(a.collection)
         : a.model && a.model !== 'file'
@@ -132,7 +194,7 @@ const strapiModelExtractImports = (m: IStrapiModel, structure: IStructure[]) => 
     .join('\n');
 };
 
-const strapiModelToInterface = (m: IStrapiModel, structure: IStructure[]) => {
+const strapiModelToInterface = (m: IStrapiModel, structure: IStructure[], enumm: boolean) => {
   const name = m.info.name;
   const interfaceName = toInterfaceName(name);
   const result: string[] = [];
@@ -150,11 +212,11 @@ const strapiModelToInterface = (m: IStrapiModel, structure: IStructure[]) => {
       if (!m.attributes.hasOwnProperty(aName)) {
         continue;
       }
-      result.push(`  ${strapiModelAttributeToProperty(aName, m.attributes[aName], structure)}`);
+      result.push(`  ${strapiModelAttributeToProperty(interfaceName, aName, m.attributes[aName], structure, enumm)}`);
     }
   }
   result.push('}\n');
-  return result.join('\n');
+  return enumm ? result.concat(strapiModelAttributeToEnum(interfaceName, m.attributes)).join('\n') : result.join('\n');
 };
 
 const writeIndex = (folder: string, structure: IStructure[]) => {
@@ -168,7 +230,7 @@ const writeIndex = (folder: string, structure: IStructure[]) => {
 /**
  * Export a StrapiModel to a TypeScript interface
  */
-export const convert = (outputFolder: string, strapiModels: IStrapiModel[], nested = false) =>
+export const convert = (outputFolder: string, strapiModels: IStrapiModel[], nested = false, enumm = false) =>
   new Promise<number>((resolve, reject) => {
     let count = strapiModels.length;
     if (!fs.existsSync(outputFolder)) {
@@ -187,7 +249,7 @@ export const convert = (outputFolder: string, strapiModels: IStrapiModel[], nest
     structure.forEach((g) => {
       const { folder, snakeName, m } = g;
       const outputFile = path.resolve(folder, `${snakeName}.ts`);
-      fs.writeFile(outputFile, strapiModelToInterface(m, structure), { encoding: 'utf8' }, (err) => {
+      fs.writeFile(outputFile, strapiModelToInterface(m, structure, enumm), { encoding: 'utf8' }, (err) => {
         count--;
         if (err) {
           reject(err);

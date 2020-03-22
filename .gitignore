@@ -63,3 +63,5 @@ typings/
 # This repo
 tmp
 dist
+
+dist/
