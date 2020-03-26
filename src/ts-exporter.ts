@@ -50,6 +50,7 @@ const toPropertyType = (interfaceName: string, fieldName: string, model: IStrapi
   const pt = model.type ? model.type.toLowerCase() : "any";
   switch (pt) {
     case 'text':
+    case 'richtext':
     case 'email':
     case 'password':
       return 'string';
