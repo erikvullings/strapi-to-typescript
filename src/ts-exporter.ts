@@ -225,6 +225,7 @@ const writeIndex = (folder: string, structure: IStructure[]) => {
   const outputFile = path.resolve(folder, 'index.ts');
   const output = structure
     .map((s) => (s.nested ? `export * from './${s.snakeName}/${s.snakeName}';` : `export * from './${s.snakeName}';`))
+    .sort()
     .join('\n');
   fs.writeFileSync(outputFile, output + '\n');
 };
