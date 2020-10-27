@@ -26,7 +26,6 @@ const toInterfaceName = (name: string) => name ? `I${name.replace(/^./, (str: st
  */
 const toPascalCase = (name: string) => name ? `${name.replace(/^./, (str: string) => str.toUpperCase())}` : 'any';
 
-
 /**
  * Convert name to snake name, e.g. camelCase => camel-case
  *
@@ -47,7 +46,7 @@ export const toSnakeName = (name: string) =>
  * @param enumm Use Enum type (or string literal types)
  */
 const toPropertyType = (interfaceName: string, fieldName: string, model: IStrapiModelAttribute, enumm: boolean) => {
-  const pt = model.type ? model.type.toLowerCase() : "any";
+  const pt = model.type ? model.type.toLowerCase() : 'any';
   switch (pt) {
     case 'text':
     case 'richtext':
@@ -55,10 +54,10 @@ const toPropertyType = (interfaceName: string, fieldName: string, model: IStrapi
     case 'password':
       return 'string';
     case 'enumeration':
-      if(enumm){
-        return model.enum ? `${interfaceName}${toPascalCase(fieldName)}` : "string";
+      if (enumm) {
+        return model.enum ? `${interfaceName}${toPascalCase(fieldName)}` : 'string';
       } else {
-        return model.enum ? `"${model.enum.join(`" | "`)}"` : "string";
+        return model.enum ? `"${model.enum.join(`" | "`)}"` : 'string';
       }
     case 'date':
       return 'Date';
@@ -70,7 +69,7 @@ const toPropertyType = (interfaceName: string, fieldName: string, model: IStrapi
     case 'float':
     case 'biginteger':
     case 'integer':
-        return 'number';
+      return 'number';
     case 'string':
     case 'number':
     case 'boolean':
@@ -88,7 +87,12 @@ const componentCompatible = (attr: IStrapiModelAttribute) => {
   return (attr.type === 'component')
     ? attr.repeatable ? { collection: attr.component!.split('.')[1] } : { model: attr.component!.split('.')[1] }
     : attr;
-}
+};
+
+const findModel = (structure: IStructure[], name: string): IStructure | undefined => {
+  return structure.filter((s) => s.name.toLowerCase() === name || s.snakeName === name).shift();
+};
+
 /**
  * Convert a Strapi Attribute to a TypeScript property.
  *
@@ -102,19 +106,14 @@ const strapiModelAttributeToProperty = (
   interfaceName: string,
   name: string,
   a: IStrapiModelAttribute,
-  structure: Array<{
-    name: string;
-    folder: string;
-    snakeName: string;
-    m: IStrapiModel;
-  }>,
+  structure: IStructure[],
   enumm: boolean
 ) => {
   const findModelName = (n: string) => {
-    const result = structure.filter((s) => s.name.toLowerCase() === n).shift();
+    const result = findModel(structure, n);
     return result ? result.name : '';
   };
-  const required = !a.required && !(a.collection || a.repeatable)  ? '?' : '';
+  const required = !a.required && !(a.collection || a.repeatable) ? '?' : '';
   a = componentCompatible(a);
   const collection = a.collection ? '[]' : '';
 
@@ -134,25 +133,25 @@ const strapiModelAttributeToProperty = (
  * Convert all Strapi Enum to TypeScript Enumeration.
  *
  * @param interfaceName name of current interface
- * @param a Attributes
+ * @param attributes
  */
 const strapiModelAttributeToEnum = (interfaceName: string, attributes: { [attr: string]: IStrapiModelAttribute }): string[] => {
-  const enums: string[] = []
+  const enums: string[] = [];
   for (const aName in attributes) {
     if (!attributes.hasOwnProperty(aName)) {
       continue;
     }
-    if(attributes[aName].type === 'enumeration'){
+    if (attributes[aName].type === 'enumeration') {
       enums.push(`export enum ${interfaceName}${toPascalCase(aName)} {`);
-      attributes[aName].enum!.forEach( e => {
-        enums.push(`  ${e} = "${e}",`); 
-      })
+      attributes[aName].enum!.forEach(e => {
+        enums.push(`  ${e} = "${e}",`);
+      });
       enums.push(`}\n`);
     }
   }
 
-  return enums
-}
+  return enums;
+};
 
 /**
  * Find all required models and import them.
@@ -163,7 +162,7 @@ const strapiModelAttributeToEnum = (interfaceName: string, attributes: { [attr: 
 const strapiModelExtractImports = (m: IStrapiModel, structure: IStructure[]) => {
   const isUnique = <T>(value: T, index: number, arr: T[]) => arr.indexOf(value) === index;
   const toImportDefinition = (name: string) => {
-    const found = structure.filter((s) => s.name.toLowerCase() === name).shift();
+    const found = findModel(structure, name);
     const toFolder = (f: IStructure) => (f.nested ? `../${f.snakeName}/${f.snakeName}` : `./${f.snakeName}`);
     return found ? `import { ${toInterfaceName(found.name)} } from '${toFolder(found)}';` : '';
   };
