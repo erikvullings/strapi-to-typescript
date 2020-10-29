@@ -8,10 +8,11 @@
   },
   "scripts": {
     "start": "tsc -w",
-    "build": "tsc",
+    "build": "rm -rf ./dist && tsc",
     "patch-release": "npm version patch && tsc && npm publish && git push --follow-tags",
     "minor-release": "npm version minor && tsc && npm publish && git push --follow-tags",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "pretest": "rm -rf ./src/test/out && ts-node src/cli.ts ./src/test/api -o ./src/test/out",
+    "test": "ts-node src/test.ts"
   },
   "repository": {
     "type": "git",
@@ -40,6 +41,8 @@
     "@types/command-line-args": "^5.0.0",
     "@types/command-line-usage": "^5.0.1",
     "@types/node": "^10.17.17",
-    "typescript": "^2.8.3"
+    "typescript": "^2.8.3",
+    "cross-blob": "^2.0.0",
+    "ts-node": "^9.0.0"
   }
 }

@@ -58,6 +58,7 @@
     "./src/**/*.ts"
   ],
   "exclude": [
-    "./tmp"
+    "./tmp",
+    "./src/test*"
   ]
 }

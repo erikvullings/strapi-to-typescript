@@ -1,4 +1,4 @@
-import * as npmPackage from '../package.json';
+const npmPackage = require('../package.json');
 import commandLineUsage from 'command-line-usage';
 import commandLineArgs from 'command-line-args';
 import { OptionDefinition } from 'command-line-args';

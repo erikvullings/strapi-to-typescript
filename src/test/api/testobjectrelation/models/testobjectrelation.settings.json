@@ -1,0 +1,36 @@
+{
+  "kind": "collectionType",
+  "collectionName": "testobjectrelations",
+  "info": {
+    "name": "testobjectrelation"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "testobject_one_way": {
+      "model": "testobject"
+    },
+    "testobject_one_one": {
+      "model": "testobject",
+      "via": "testobjectrelation"
+    },
+    "testobjects_one_many": {
+      "collection": "testobject",
+      "via": "testobjectrelation"
+    },
+    "testobject_many_one": {
+      "model": "testobject",
+      "via": "testobjectrelations"
+    },
+    "testobjects_many_many": {
+      "collection": "testobject",
+      "via": "testobjectrelations",
+      "dominant": true
+    },
+    "testobjects_poly": {
+      "collection": "testobject"
+    }
+  }
+}
