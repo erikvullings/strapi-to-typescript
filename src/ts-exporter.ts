@@ -54,6 +54,8 @@ const toPropertyType = (interfaceName: string, fieldName: string, model: IStrapi
     case 'richtext':
     case 'email':
     case 'password':
+    case 'uid':
+    case 'time':
       return 'string';
     case 'enumeration':
       if (enumm) {
@@ -62,11 +64,15 @@ const toPropertyType = (interfaceName: string, fieldName: string, model: IStrapi
         return model.enum ? `"${model.enum.join(`" | "`)}"` : 'string';
       }
     case 'date':
+    case 'datetime':
+    case 'timestamp':
       return 'Date';
     case 'media':
       return 'Blob';
     case 'json':
       return '{ [key: string]: any }';
+    case 'dynamiczone':
+      return 'any[]'
     case 'decimal':
     case 'float':
     case 'biginteger':
@@ -122,9 +128,7 @@ const strapiModelAttributeToProperty = (
   const propType = a.collection
     ? toInterfaceName(findModelName(a.collection))
     : a.model
-      ? a.model === 'file'
-        ? 'Blob'
-        : toInterfaceName(findModelName(a.model))
+      ? toInterfaceName(findModelName(a.model))
       : a.type
         ? toPropertyType(interfaceName, name, a, enumm)
         : 'unknown';
@@ -179,7 +183,7 @@ const strapiModelExtractImports = (m: IStrapiModel, structure: IStructure[]) => 
 
       const proposedImport = a.collection
         ? toImportDefinition(a.collection)
-        : a.model && a.model !== 'file'
+        : a.model
           ? toImportDefinition(a.model)
           : '';
       if (proposedImport) {

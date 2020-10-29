@@ -23,6 +23,7 @@ export interface IStrapiModel {
   info: {
     name: string;
     description: string;
+    icon?: string;
   };
   options?: {
     timestamps: boolean;
