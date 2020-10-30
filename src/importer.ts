@@ -54,7 +54,7 @@ const walk = (
   });
 };
 
-export const findFiles = (dir: string, ext: RegExp = /.settings.json$/ ) =>
+export const findFiles = (dir: string, ext: RegExp = /.settings.json$/) =>
   new Promise<string[]>((resolve, reject) => {
     const filter = (f: string) => ext.test(f);
     walk(
@@ -75,8 +75,7 @@ export const findFiles = (dir: string, ext: RegExp = /.settings.json$/ ) =>
  * Wrapper around "findFiles".
  * 
  */
-export
-  async function findFilesFromMultipleDirectories(...files:string[]): Promise<string[]> {
+export async function findFilesFromMultipleDirectories(...files: string[]): Promise<string[]> {
   const inputs = [... new Set(files)]
 
   var actions = inputs.map(i => findFiles(i)); // run the function over all items
@@ -89,23 +88,35 @@ export
   return (new Array<string>()).concat.apply([], results)
 }
 
-
-
-
 /*
  */
-
 export const importFiles = (files: string[]) =>
   new Promise<IStrapiModel[]>((resolve, reject) => {
+
     let pending = files.length;
     const results: IStrapiModel[] = [];
-    files.forEach((f) =>
+    const names: string[] = [];
+
+    files.forEach(f =>
       fs.readFile(f, { encoding: 'utf8' }, (err, data) => {
-        if (err) {
-          reject(err);
-        }
+
+        if (err) reject(err);
         pending--;
-        results.push(Object.assign(JSON.parse(data), { _filename: f }));
+
+        let strapiModel = Object.assign(JSON.parse(data), { _filename: f })
+        if (strapiModel.info && strapiModel.info.name) {
+          let sameNameIndex = names.indexOf(strapiModel.info.name);
+          if (sameNameIndex === -1) {
+            results.push(strapiModel);
+            names.push(strapiModel.info.name)
+          } else {
+            console.warn(`Already have model '${strapiModel.info.name}' => skip ${results[sameNameIndex]._filename} use ${strapiModel._filename}`)
+            results[sameNameIndex] = strapiModel;
+          }
+        } else {
+          results.push(strapiModel);
+        }
+
         if (pending === 0) {
           resolve(results);
         }

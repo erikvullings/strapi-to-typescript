@@ -1,33 +1,32 @@
-import Blob from 'cross-blob';
+import { Xfile, Xtestobject, Xtestobjectrelation, EnumXtestobjectenum_field } from './test/out';
 
-import { ITestobject, ITestobjectrelation } from './test/out';
-
-// implementation of ITestobject test required and type fields
-class ITestobjectImpl implements ITestobject {
-
+// implementation of Xtestobject test required and type fields
+class XtestobjectXmpl implements Xtestobject {
     id: string;
+
     string_optional_field?: string;
     short_text_field: string;
-    long_text_field?: string;
-    richtext_field?: string;
-    integer_field?: number;
-    big_integer_field?: number;
-    truncated_float_field?: number;
-    float_field?: number;
-    date_field?: Date;
-    datetime_field?: any;
-    time_field?: any;
-    boolean_field?: boolean;
-    email_field?: string;
-    password_field?: string;
-    enum_field?: 'enum1' | 'enum2';
+    long_text_field: string;
+    richtext_field: string;
+    integer_field: number;
+    big_integer_field: number;
+    truncated_float_field: number;
+    float_field: number;
+    date_field: Date;
+    datetime_field: any;
+    time_field: any;
+    boolean_field: boolean;
+    email_field: string;
+    password_field: string;
+    enum_field: EnumXtestobjectenum_field;
     mulitple_media_field: any[];
-    single_media_field?: Blob;
-    json_field?: { [key: string]: any; };
-    uid_field?: any;
+    single_media_field?: Xfile;
+    json_field: { [key: string]: any; };
+    uid_field: any;
+    created_by: string;
 
-    testobjectrelation?: ITestobjectrelation;
-    testobjectrelations: ITestobjectrelation[];
+    testobjectrelation?: Xtestobjectrelation;
+    testobjectrelations: Xtestobjectrelation[];
 
     constructor() {
         this.id = "id"
@@ -42,46 +41,44 @@ class ITestobjectImpl implements ITestobject {
         this.boolean_field = true;
         this.email_field = "email_field";
         this.password_field = "password_field";
-        this.enum_field = 'enum1';
-        this.single_media_field = new Blob([]);
+        this.enum_field = EnumXtestobjectenum_field.enum1;
         this.json_field = {};
+        this.created_by = "created_by";
 
         this.testobjectrelations = [];
 
-        // TOFIX => any field
+        // TOFXX => any field
 
         this.mulitple_media_field = [];
         this.datetime_field = {};
         this.time_field = {};
         this.uid_field = {};
     }
-
 }
 
-class ITestobjectrelationImpl implements ITestobjectrelation {
+class XtestobjectrelationXmpl implements Xtestobjectrelation {
     id: string;
-    testobject_one_way?: ITestobject;
-    testobject_one_one?: ITestobject;
-    testobjects_one_many: ITestobject[];
-    testobject_many_one?: ITestobject;
-    testobjects_many_many: ITestobject[];
-    testobjects_poly: ITestobject[];
 
-    constructor(testobject: ITestobject) {
+    testobject_one_way?: Xtestobject;
+    testobject_one_one?: Xtestobject;
+    testobjects_one_many: Xtestobject[];
+    testobject_many_one?: Xtestobject;
+    testobjects_many_many: Xtestobject[];
+    testobjects_poly: Xtestobject[];
+
+    constructor(testobject: Xtestobject) {
         this.id = "id";
-        // this.testobject_one_way?: ITestobject;
-        // this.testobject_one_one?: ITestobject;
         this.testobjects_one_many = [testobject];
-        // this.testobject_many_one?: ITestobject;
         this.testobjects_many_many = [testobject];
         this.testobjects_poly = [testobject];
     }
 }
 
 // test optional fields
-const testobject = new ITestobjectImpl();
+const testobject = new XtestobjectXmpl();
 testobject.string_optional_field = "stringfieldoptional";
 
-const testobjectrelation = new ITestobjectrelationImpl(testobject);
-
-console.log(testobject, testobjectrelation)
+const testobjectrelation = new XtestobjectrelationXmpl(testobject);
+testobjectrelation.testobject_one_way = testobject;
+testobjectrelation.testobject_one_one = testobject;
+testobjectrelation.testobject_many_one = testobject;

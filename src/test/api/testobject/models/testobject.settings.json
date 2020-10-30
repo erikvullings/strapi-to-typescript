@@ -1,100 +1,109 @@
 {
-  "kind": "collectionType",
-  "collectionName": "testobjects",
-  "info": {
-    "name": "testobject"
-  },
-  "options": {
-    "increments": true,
-    "timestamps": true
-  },
-  "attributes": {
-    "string_optional_field": {
-      "type": "string",
-      "required": false
+    "kind": "collectionType",
+    "collectionName": "testobjects",
+    "info": {
+        "name": "testobject"
     },
-    "short_text_field": {
-      "type": "string",
-      "required": true
+    "options": {
+        "increments": true,
+        "timestamps": true
     },
-    "long_text_field": {
-      "type": "string"
-    },
-    "richtext_field": {
-      "type": "richtext"
-    },
-    "integer_field": {
-      "type": "integer"
-    },
-    "big_integer_field": {
-      "type": "biginteger"
-    },
-    "truncated_float_field": {
-      "type": "decimal"
-    },
-    "float_field": {
-      "type": "float"
-    },
-    "date_field": {
-      "type": "date"
-    },
-    "datetime_field": {
-      "type": "datetime"
-    },
-    "time_field": {
-      "type": "time"
-    },
-    "boolean_field": {
-      "type": "boolean"
-    },
-    "email_field": {
-      "type": "email"
-    },
-    "password_field": {
-      "type": "password"
-    },
-    "enum_field": {
-      "type": "enumeration",
-      "enum": [
-        "enum1",
-        "enum2"
-      ]
-    },
-    "mulitple_media_field": {
-      "collection": "file",
-      "via": "related",
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos"
-      ],
-      "plugin": "upload",
-      "required": false
-    },
-    "single_media_field": {
-      "model": "file",
-      "via": "related",
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos"
-      ],
-      "plugin": "upload",
-      "required": false
-    },
-    "json_field": {
-      "type": "json"
-    },
-    "uid_field": {
-      "type": "uid"
-    },
-    "testobjectrelation": {
-      "via": "testobjects_one_many",
-      "model": "testobjectrelation"
-    },
-    "testobjectrelations": {
-      "via": "testobjects_many_many",
-      "collection": "testobjectrelation"
+    "attributes": {
+        "string_optional_field": {
+            "type": "string",
+            "required": false
+        },
+        "short_text_field": {
+            "type": "string",
+            "required": true
+        },
+        "long_text_field": {
+            "type": "string",
+            "required": true
+        },
+        "richtext_field": {
+            "type": "richtext",
+            "required": true
+        },
+        "integer_field": {
+            "type": "integer",
+            "required": true
+        },
+        "big_integer_field": {
+            "type": "biginteger",
+            "required": true
+        },
+        "truncated_float_field": {
+            "type": "decimal",
+            "required": true
+        },
+        "float_field": {
+            "type": "float",
+            "required": true
+        },
+        "date_field": {
+            "type": "date",
+            "required": true
+        },
+        "datetime_field": {
+            "type": "datetime",
+            "required": true
+        },
+        "time_field": {
+            "type": "time",
+            "required": true
+        },
+        "boolean_field": {
+            "type": "boolean",
+            "required": true
+        },
+        "email_field": {
+            "type": "email",
+            "required": true
+        },
+        "password_field": {
+            "type": "password",
+            "required": true
+        },
+        "enum_field": {
+            "type": "enumeration",
+            "required": true,
+            "enum": ["enum1", "enum2"]
+        },
+        "mulitple_media_field": {
+            "collection": "file",
+            "via": "related",
+            "allowedTypes": [
+                "images", "files", "videos"
+            ],
+            "plugin": "upload",
+            "required": true
+        },
+        "single_media_field": {
+            "model": "file",
+            "via": "related",
+            "allowedTypes": [
+                "images", "files", "videos"
+            ],
+            "plugin": "upload",
+            "required": false
+        },
+        "json_field": {
+            "type": "json",
+            "required": true
+
+        },
+        "uid_field": {
+            "type": "uid",
+            "required": true
+        },
+        "testobjectrelation": {
+            "via": "testobjects_one_many",
+            "model": "testobjectrelation"
+        },
+        "testobjectrelations": {
+            "via": "testobjects_many_many",
+            "collection": "testobjectrelation"
+        }
     }
-  }
 }

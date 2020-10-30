@@ -1,6 +1,6 @@
 {
   "name": "strapi-to-typescript",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "Convert the strapi models to typescript interfaces.",
   "main": "index.js",
   "bin": {
@@ -11,8 +11,9 @@
     "build": "rm -rf ./dist && tsc",
     "patch-release": "npm version patch && tsc && npm publish && git push --follow-tags",
     "minor-release": "npm version minor && tsc && npm publish && git push --follow-tags",
-    "pretest": "rm -rf ./src/test/out && ts-node src/cli.ts ./src/test/api -o ./src/test/out",
-    "test": "ts-node src/test.ts"
+    "pretest": "rm -rf ./src/test/out && ts-node src/cli.ts -c ./src/test/config.js",
+    "test": "ts-node src/test.ts",
+    "prepublishOnly": "npm run build && npm run test"
   },
   "repository": {
     "type": "git",
@@ -41,8 +42,7 @@
     "@types/command-line-args": "^5.0.0",
     "@types/command-line-usage": "^5.0.1",
     "@types/node": "^10.17.17",
-    "typescript": "^2.8.3",
-    "cross-blob": "^2.0.0",
-    "ts-node": "^9.0.0"
+    "ts-node": "^9.0.0",
+    "typescript": "^2.8.3"
   }
 }

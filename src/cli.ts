@@ -3,23 +3,8 @@ import commandLineUsage from 'command-line-usage';
 import commandLineArgs from 'command-line-args';
 import { OptionDefinition } from 'command-line-args';
 import { exec } from './processor';
-
-const log = console.log;
-
-export interface ICommandOptions {
-  /** Strapi folder(s) with models */
-  input: string[];
-  /** Strapi folder(s) with groups models */
-  inputGroup: string;
-  /** Output folder */
-  output: string;
-  /** Put all interfaces in a nested tree instead of directly under the output folder */
-  nested: boolean;
-  /** Generate enumeration */
-  enum: boolean;
-  /** Display help output */
-  help: boolean;
-}
+import { ICommandOptions, IConfigOptions } from '..';
+import { resolve } from 'path'
 
 interface IOptionDefinition extends OptionDefinition {
   typeLabel: string;
@@ -39,7 +24,7 @@ export class CommandLineInterface {
       name: 'input',
       alias: 'i',
       type: String,
-      multiple:true,
+      multiple: true,
       typeLabel: '{underline String}',
       defaultOption: true,
       description: 'Input folder with the Strapi models (api folder).',
@@ -49,8 +34,7 @@ export class CommandLineInterface {
       alias: 'g',
       type: String,
       typeLabel: '{underline String}',
-      defaultValue: undefined,
-      description: 'Input folder with the Strapi models (groups folder).',
+      description: 'Input folder with the Strapi models (groups/components folder).'
     },
     {
       name: 'output',
@@ -58,7 +42,14 @@ export class CommandLineInterface {
       type: String,
       typeLabel: '{underline String}',
       defaultValue: '.',
-      description: 'Output folder with the TypeScript models.',
+      description: 'Output folder with the TypeScript models. (default: current directory)',
+    },
+    {
+      name: 'config',
+      alias: 'c',
+      type: String,
+      typeLabel: '{underline String}',
+      description: 'Advanced configuration file.',
     },
     {
       name: 'nested',
@@ -83,7 +74,10 @@ export class CommandLineInterface {
       header: `${npmPackage.name.toUpperCase()}, v${npmPackage.version}`,
       content: `${npmPackage.license} license.
 
-    ${npmPackage.description}`,
+    ${npmPackage.description}
+
+    Usage: sts ([OPTION]...) [INPUT FOLDER]...
+    `,
     },
     {
       header: 'Options',
@@ -115,11 +109,31 @@ export class CommandLineInterface {
 
 const options = commandLineArgs(CommandLineInterface.optionDefinitions) as ICommandOptions;
 
-if (options.help || !options.input) {
-  const usage = commandLineUsage(CommandLineInterface.sections);
+const usage = commandLineUsage(CommandLineInterface.sections);
+
+const log = console.log;
+const warn = (...x: any[]) => {
+  log(usage);
+  console.warn('\x1b[31m%s\x1b[0m', ...x);
+  process.exit(1);
+}
+
+if (options.help) {
   log(usage);
   process.exit(0);
 } else {
-  // Do your thing
-  exec(options);
+
+  // if arg config file, merge command line options with config file options
+  const mergedOptions: IConfigOptions = (options.config) ? {
+    ...options,
+    ...require(resolve(process.cwd(), options.config))
+  } : options;
+
+  if (!mergedOptions.input) {
+    warn('need input folder');
+  } else if ('inputGroup' in mergedOptions && !mergedOptions.inputGroup) {
+    warn('option -g need argument');
+  } else {
+    exec(mergedOptions);
+  }
 }
