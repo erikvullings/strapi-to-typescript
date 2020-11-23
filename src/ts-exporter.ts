@@ -10,29 +10,17 @@ interface IStrapiModelExtended extends IStrapiModel {
 }
 
 const util = {
-  /**
-   * Convert a name to a Pascal case name, e.g. pascalCase => PascalCase.
-   *
-   * @param name camelCase name
-   */
+
+  // InterfaceName
   defaultToInterfaceName: (name: string) => name ? `I${name.replace(/^./, (str: string) => str.toUpperCase()).replace(/[ ]+./g, (str: string) => str.trimLeft().toUpperCase())}` : 'any',
-
   overrideToInterfaceName: undefined as IConfigOptions['interfaceName'] | undefined,
-
   toInterfaceName(name: string) {
     return util.overrideToInterfaceName ? util.overrideToInterfaceName(name) || util.defaultToInterfaceName(name) : this.defaultToInterfaceName(name);
   },
 
-  /**
-   * Convert a name to a Pascal case name
-   * pascalCase => PascalCase.
-   *
-   * @param name name
-   */
+  // EnumName
   defaultToEnumName: (name: string, interfaceName: string) => name ? `${interfaceName}${name.replace(/^./, (str: string) => str.toUpperCase())}` : 'any',
-
   overrideToEnumName: undefined as IConfigOptions['enumName'] | undefined,
-
   toEnumName(name: string, interfaceName: string) {
     return this.overrideToEnumName ? this.overrideToEnumName(name, interfaceName) || this.defaultToEnumName(name, interfaceName) : this.defaultToEnumName(name, interfaceName);
   },
@@ -83,9 +71,7 @@ const util = {
         return pt;
     }
   },
-
   overrideToPropertyType: undefined as IConfigOptions['type'] | undefined,
-
   toPropertyType(interfaceName: string, fieldName: string, model: IStrapiModelAttribute, enumm: boolean) {
     return this.overrideToPropertyType ? this.overrideToPropertyType(`${model.type}`, fieldName, interfaceName) || this.defaultToPropertyType(interfaceName, fieldName, model, enumm) : this.defaultToPropertyType(interfaceName, fieldName, model, enumm);
   },
@@ -239,7 +225,8 @@ class Converter {
   ) {
     const findModelName = (n: string) => {
       const result = findModel(this.strapiModels, n);
-      return result ? result.interfaceName : '';
+      if(!result) console.debug(`type '${n}' unknown on ${interfaceName}[${name}] => fallback to 'any'. Add in the input arguments the folder that contains *.settings.json with info.name === '${n}'`)
+      return result ? result.interfaceName : 'any';
     };
 
     const required = !a.required && !(a.collection || a.repeatable) ? '?' : '';

@@ -28,22 +28,30 @@ export interface IConfigOptions extends ICommandOptions {
     /**
      * Model Strapi info.name => name of typescript interface.
      * (use default, if empty return)
+     * example:
+     *      (name) => name.charAt(0).toUpperCase() + name.slice(1)
      */
     interfaceName: (name: string) => string | undefined;
 
     /**
      * Model Strapi attributes name.
      * (use default, if empty return)
+     * example:
+     *      (name) => 'Enum' + name.charAt(0).toUpperCase() + name.slice(1)
      */
     enumName: (name: string, interfaceName: string) => string | undefined;
 
     /**
      * Exclude field on typescript interface.
+     * example:
+     *      (interfaceName, fieldName) => fieldName === 'hide_field'
      */
     excludeField: (interfaceName: string, fieldName: string) => boolean | undefined;
 
     /**
      * add your fields on typescript interface.
+     * example:
+     *      () => [{ name: "created_by", type: "string" }, { name: "updated_by", type: "string" }]
      */
     addField: (interfaceName: string) => { name: string, type: string }[]
 }
