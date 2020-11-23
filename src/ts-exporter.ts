@@ -229,7 +229,7 @@ class Converter {
       return result ? result.interfaceName : 'any';
     };
 
-    const required = !a.required && !(a.collection || a.repeatable) ? '?' : '';
+    const required = !a.required && !(!this.config.collectionCanBeUndefined && (a.collection || a.repeatable)) ? '?' : '';
     a = componentCompatible(a);
     const collection = a.collection ? '[]' : '';
 

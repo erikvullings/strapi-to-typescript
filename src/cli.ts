@@ -11,6 +11,12 @@ interface IOptionDefinition extends OptionDefinition {
   description: string;
 }
 
+function examplePath() {
+  const pathToEx = `${__dirname}/.stsconfig.js`
+  if (pathToEx.startsWith(process.cwd())) return pathToEx.replace(process.cwd(), '.')
+  return pathToEx;
+}
+
 export class CommandLineInterface {
   public static optionDefinitions: IOptionDefinition[] = [
     {
@@ -67,6 +73,14 @@ export class CommandLineInterface {
       defaultValue: false,
       description: 'If true, Enumeration is generate, else string literal types is used',
     },
+    {
+      name: 'collectionCanBeUndefined',
+      alias: 'u',
+      type: Boolean,
+      typeLabel: '{underline Boolean}',
+      defaultValue: false,
+      description: 'If true, collection can be undefined',
+    },
   ];
 
   public static sections = [
@@ -88,24 +102,29 @@ export class CommandLineInterface {
       content: [
         {
           desc: '01. Convert the Strapi API folder and write the results to current folder.',
-          example: '$ sts [PATH\\TO\\API]',
+          example: '$ sts ./api',
         },
         {
           desc: '02. Convert the Strapi API folder and write the results to output folder.',
-          example: '$ sts [PATH\\TO\\API] -o [PATH\\TO\\OUTPUT]',
+          example: '$ sts ./api -o ./sts',
         },
         {
           desc: '03. Add each interface to its own folder.',
-          example: '$ sts [PATH\\TO\\API] -o [PATH\\TO\\OUTPUT] -n',
+          example: '$ sts ./api -o ./sts -n',
         },
         {
           desc: '04. Define multiple input folders.',
-          example: '$ sts [PATH\\TO\\API] [PATH\\TO\\Plugin] [PATH\\TO\\Another_Plugin]',
+          example: '$ sts ./api ./node_modules/strapi-plugin-users-permissions/models/ ./node_modules/strapi-plugin-upload/models/',
         },
+        {
+          desc: `05. Use advanced configuration. See example: ${examplePath()}`,
+          example: '$ sts -c ./stsconfig.js',
+        }
       ],
     },
   ];
 }
+
 
 const options = commandLineArgs(CommandLineInterface.optionDefinitions) as ICommandOptions;
 

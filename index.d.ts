@@ -9,6 +9,8 @@ export interface ICommandOptions {
     nested: boolean;
     /** Generate enumeration */
     enum: boolean;
+    /** By default, all collection can not be undefined. You can turn this off, so only unrequired collections may be undefined. */
+    collectionCanBeUndefined: boolean
 
     /** configuration file*/
     config: string;
