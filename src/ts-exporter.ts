@@ -228,7 +228,7 @@ class Converter {
   ) {
     const findModelName = (n: string) => {
       const result = findModel(this.strapiModels, n);
-      if(!result) console.debug(`type '${n}' unknown on ${interfaceName}[${name}] => fallback to 'any'. Add in the input arguments the folder that contains *.settings.json with info.name === '${n}'`)
+      if (!result && n !== '*') console.debug(`type '${n}' unknown on ${interfaceName}[${name}] => fallback to 'any'. Add in the input arguments the folder that contains *.settings.json with info.name === '${n}'`)
       return result ? result.interfaceName : 'any';
     };
 

@@ -55,19 +55,6 @@ export interface IOrder {
 
 # Advanced configuration
 
-package.json
-```json
-{
-  "//" : "..."
-
-  "scripts": {
-    "sts": "sts -c .stsconfig"
-  },
-
-  "///" : "..."
-}
-```
-
 .stsconfig
 ```javascript
 
@@ -89,9 +76,22 @@ const config = {
     interfaceName: (name) => `X${name}`,
     enumName: (name, interfaceName) => `Enum${interfaceName}${name}`,
     excludeField: (interfaceName, fieldName) => fieldName === 'hide_field',
-    addField: (interfaceName) =>[{ name: "created_by", type: "string" }]
+    addField: (interfaceName) => [{ name: "created_by", type: "string" }]
 }
 module.exports = config;
+```
+
+package.json
+```json
+{
+  "//" : "..."
+
+  "scripts": {
+    "sts": "sts -c .stsconfig"
+  },
+
+  "///" : "..."
+}
 ```
 
 # Build
