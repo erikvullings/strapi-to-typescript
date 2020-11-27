@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { singular } from 'pluralize'
 import { IStrapiModel, IStrapiModelAttribute } from './models/strapi-model';
 import { IConfigOptions } from '..';
 
@@ -91,9 +92,11 @@ const findModel = (structure: IStrapiModelExtended[], name: string): IStrapiMode
  * @param attr IStrapiModelAttribute
  */
 const componentCompatible = (attr: IStrapiModelAttribute) => {
-  return (attr.type === 'component')
-    ? attr.repeatable ? { collection: attr.component!.split('.')[1] } : { model: attr.component!.split('.')[1] }
-    : attr;
+  if (attr.type === 'component'){
+    let model = singular(attr.component!.split('.')[1])
+    return attr.repeatable ? { collection: model } : { model: model }
+  }
+  return attr;
 }
 
 
@@ -164,13 +167,13 @@ class Converter {
     result.push('  id: string;');
 
     if (m.attributes) for (const aName in m.attributes) {
-      if ((util.excludeField && util.excludeField(m.interfaceName, aName)) || !m.attributes.hasOwnProperty(aName) ) continue;
+      if ((util.excludeField && util.excludeField(m.interfaceName, aName)) || !m.attributes.hasOwnProperty(aName)) continue;
       result.push(`  ${this.strapiModelAttributeToProperty(m.interfaceName, aName, m.attributes[aName])}`);
     }
 
-    if(util.addField){
+    if (util.addField) {
       let addFields = util.addField(m.interfaceName);
-      if(addFields && Array.isArray(addFields)) for (let f of addFields){
+      if (addFields && Array.isArray(addFields)) for (let f of addFields) {
         result.push(`  ${f.name}: ${f.type};`)
       }
     }

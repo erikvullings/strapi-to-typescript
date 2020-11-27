@@ -12,7 +12,14 @@ Convert the Strapi models to TypeScript interfaces by processing each of the `./
 
 ```console
 npm install -g strapi-to-typescript
+
 sts path/to/strapi/api/ -o path/to/your/types/dir/
+
+# see all doc
+sts -h
+
+# external conf. see: strapi-to-typescript/index.d.ts for format
+sts -c .stsconfig.js
 ```
 
 You may define multiple inputs. In case your API models have relations to other plugins like 'users-permissions'.
@@ -51,10 +58,13 @@ export interface IOrder {
 package.json
 ```json
 {
-  //...
+  "//" : "..."
+
   "scripts": {
     "sts": "sts -c .stsconfig"
-  }
+  },
+
+  "///" : "..."
 }
 ```
 
