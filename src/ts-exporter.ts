@@ -13,7 +13,7 @@ interface IStrapiModelExtended extends IStrapiModel {
 const util = {
 
   // InterfaceName
-  defaultToInterfaceName: (name: string) => name ? `I${name.replace(/^./, (str: string) => str.toUpperCase()).replace(/[ ]+./g, (str: string) => str.trimLeft().toUpperCase())}` : 'any',
+  defaultToInterfaceName: (name: string) => name ? `I${name.replace(/^./, (str: string) => str.toUpperCase()).replace(/[ ]+./g, (str: string) => str.trimLeft().toUpperCase()).replace(/\//g, '')}` : 'any',
   overrideToInterfaceName: undefined as IConfigOptions['interfaceName'] | undefined,
   toInterfaceName(name: string) {
     return util.overrideToInterfaceName ? util.overrideToInterfaceName(name) || util.defaultToInterfaceName(name) : this.defaultToInterfaceName(name);
@@ -121,7 +121,7 @@ class Converter {
         snakeName: m.info.name
           .split(/(?=[A-Z])/)
           .join('-')
-          .replace(/[- ]+/g, "-")
+          .replace(/[\/\- ]+/g, "-")
           .toLowerCase(),
         interfaceName: util.toInterfaceName(m.info.name)
       }
