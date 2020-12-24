@@ -72,7 +72,7 @@ const config = {
     output: './sts/',
     enum: true,
     nested: false,
-    type: (fieldType) => { if(fieldType == 'datetime') return 'string'},
+    type: (fieldType) => { if(fieldType == 'datetime') return 'string' },
     interfaceName: (name) => `X${name}`,
     enumName: (name, interfaceName) => `Enum${interfaceName}${name}`,
     excludeField: (interfaceName, fieldName) => fieldName === 'hide_field',
@@ -84,7 +84,7 @@ module.exports = config;
 package.json
 ```json
 {
-  "//" : "..."
+  "//" : "...",
 
   "scripts": {
     "sts": "sts -c .stsconfig"
