@@ -164,7 +164,11 @@ class Converter {
     result.push(` * Model definition for ${m.name}`);
     result.push(' */');
     result.push(`export interface ${m.interfaceName} {`);
-    result.push('  id: string;');
+
+    result.push(`  ${this.strapiModelAttributeToProperty(m.interfaceName, 'id', {
+      type: 'string',
+      required: true
+    })}`);
 
     if (m.attributes) for (const aName in m.attributes) {
       if ((util.excludeField && util.excludeField(m.interfaceName, aName)) || !m.attributes.hasOwnProperty(aName)) continue;

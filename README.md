@@ -62,6 +62,8 @@ export interface IOrder {
  * @type {import('strapi-to-typescript')}
  */
 const config = {
+
+    //required 
     input: [
       'api',
       './node_modules/strapi-plugin-users-permissions/models/',
@@ -70,13 +72,18 @@ const config = {
     ],
     inputGroup: './components/',
     output: './sts/',
+
+    // optional
     enum: true,
     nested: false,
-    type: (fieldType) => { if(fieldType == 'datetime') return 'string' },
-    interfaceName: (name) => `X${name}`,
-    enumName: (name, interfaceName) => `Enum${interfaceName}${name}`,
     excludeField: (interfaceName, fieldName) => fieldName === 'hide_field',
     addField: (interfaceName) => [{ name: "created_by", type: "string" }]
+
+    // optional, builtin function used if undefined return
+    type: (fieldType, fieldName, interfaceName) => { if(fieldType == 'datetime') return 'string' },
+    interfaceName: (name) => `X${name}`,
+    enumName: (name, interfaceName) => `Enum${interfaceName}${name}`,
+
 }
 module.exports = config;
 ```
