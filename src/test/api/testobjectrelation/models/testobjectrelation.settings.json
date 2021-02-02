@@ -29,6 +29,9 @@
       "via": "testobjectrelations",
       "dominant": true
     },
+    "testobject_dependonitself": {
+      "model": "testobjectrelation"
+    },
     "testobjects_poly": {
       "collection": "testobject"
     }
