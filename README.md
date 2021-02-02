@@ -77,7 +77,7 @@ const config = {
     enum: true,
     nested: false,
     excludeField: (interfaceName, fieldName) => fieldName === 'hide_field',
-    addField: (interfaceName) => [{ name: "created_by", type: "string" }]
+    addField: (interfaceName) => [{ name: "created_by", type: "string" }],
 
     // optional, builtin function used if undefined return
     type: (fieldType, fieldName, interfaceName) => { if(fieldType == 'datetime') return 'string' },

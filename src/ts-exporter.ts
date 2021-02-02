@@ -206,6 +206,7 @@ class Converter {
     if (m.attributes) for (const aName in m.attributes) {
       if (!m.attributes.hasOwnProperty(aName)) continue;
       const a = componentCompatible(m.attributes[aName]);
+      if(a.collection || a.model === m.name) continue;
 
       const proposedImport = toImportDefinition(a.collection || a.model || '')
       if (proposedImport) imports.push(proposedImport);
