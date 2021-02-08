@@ -27,25 +27,25 @@ sts -c .stsconfig.js
 `sts input -g inputGroup -o output ...`
 
 ### required
-* **input**
+* **input**  
 Strapi folder(s) with models *.settings.json
 You may define multiple inputs. In case your API models have relations to other plugins like 'users-permissions'.
 `sts path/to/strapi/api/ path/to/strapi/plugins/users-permissions/models -o path/to/your/types/dir/`
 
-* **-g inputGroup**
+* **-g inputGroup**  
 Strapi folder(s) with groups models
 
 ### optional
-* **-o output**
+* **-o output**  
 Output folder
-* **-n nested**
+* **-n nested**  
 Put all interfaces in a nested tree instead of directly under the output folder
-* **-u collectionCanBeUndefined**
+* **-u collectionCanBeUndefined**  
 By default, all collection can not be undefined. You can turn this off, so only unrequired collections may be undefined.
-* **-e Enumeration**
+* **-e Enumeration**  
 You may generate **enumeration** or **string literal**
 Example:
-   ```typescript
+```typescript
 // enumeration (with -e option) 
 export interface IOrder {
     payment: IOrderPayment;
@@ -58,9 +58,9 @@ export enum IOrderPayment {
 export interface IOrder {
     payment: "card" | "check";
 }
-   ```
+```
 
-* **-c Advanced configuration**
+* **-c Advanced configuration**  
 path to configuration file
 
 # Advanced configuration
