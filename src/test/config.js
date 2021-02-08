@@ -8,7 +8,8 @@ const config = {
     ],
     output: 'src/test/out/',
     enum: true,
-    type: (fieldType) => { if(fieldType == 'datetime') return 'string'},
+    fieldType: (fieldType) => { if(fieldType == 'datetime') return 'string'},
+    // fieldName: (fieldName) => fieldName.replace('_', '-'),
     interfaceName(name){
         return `X${name}`
     },

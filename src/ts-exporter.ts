@@ -72,10 +72,19 @@ const util = {
         return pt;
     }
   },
-  overrideToPropertyType: undefined as IConfigOptions['type'] | undefined,
+  overrideToPropertyType: undefined as IConfigOptions['fieldType'] | undefined,
   toPropertyType(interfaceName: string, fieldName: string, model: IStrapiModelAttribute, enumm: boolean) {
     return this.overrideToPropertyType ? this.overrideToPropertyType(`${model.type}`, fieldName, interfaceName) || this.defaultToPropertyType(interfaceName, fieldName, model, enumm) : this.defaultToPropertyType(interfaceName, fieldName, model, enumm);
   },
+
+  defaultToPropertyname(fieldName: string){
+    return fieldName
+  },
+  overrideToPropertyName: undefined as IConfigOptions['fieldName'] | undefined,
+  toPropertyName(fieldName: string, interfaceName: string, ){
+    return this.overrideToPropertyName ? this.overrideToPropertyName(fieldName, interfaceName) || this.defaultToPropertyname(fieldName) : this.defaultToPropertyname(fieldName);
+  },
+
 
   excludeField: undefined as IConfigOptions['excludeField'] | undefined,
 
@@ -110,9 +119,11 @@ class Converter {
 
     if (config.enumName && typeof config.enumName === 'function') util.overrideToEnumName = config.enumName;
     if (config.interfaceName && typeof config.interfaceName === 'function') util.overrideToInterfaceName = config.interfaceName;
-    if (config.type && typeof config.type === 'function') util.overrideToPropertyType = config.type;
+    if (config.fieldType && typeof config.fieldType === 'function') util.overrideToPropertyType = config.fieldType;
+    else if (config.type && typeof config.type === 'function') util.overrideToPropertyType = config.type;
     if (config.excludeField && typeof config.excludeField === 'function') util.excludeField = config.excludeField;
     if (config.addField && typeof config.addField === 'function') util.addField = config.addField;
+    if (config.fieldName && typeof config.fieldName === 'function') util.overrideToPropertyName = config.fieldName;
 
     this.strapiModels = strapiModelsParse.map(m => {
       return {
@@ -248,7 +259,10 @@ class Converter {
         : a.type
           ? util.toPropertyType(interfaceName, name, a, this.config.enum)
           : 'unknown';
-    return `${name}${required}: ${propType}${collection};`;
+
+    const fieldName = util.toPropertyName(name, interfaceName);
+
+    return `${fieldName}${required}: ${propType}${collection};`;
   };
 
   /**

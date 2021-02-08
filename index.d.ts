@@ -25,7 +25,20 @@ export interface IConfigOptions extends ICommandOptions {
      * example:
      *      (fieldType) => { if(fieldType == 'datetime') return 'string'}
      */
+    fieldType: (fieldType: string, fieldName: string, interfaceName: string) => string | undefined;
+
+    /**
+     * @deprecated use fieldType
+     */
     type: (fieldType: string, fieldName: string, interfaceName: string) => string | undefined;
+
+    /**
+     * Model Strapi attributes name => name of field.
+     * (use default, if empty return)
+     * example:
+     *      (fieldName) => fieldName.replace('_', '')
+     */
+    fieldName: (fieldName: string, interfaceName: string) => string | undefined;
 
     /**
      * Model Strapi info.name => name of typescript interface.
