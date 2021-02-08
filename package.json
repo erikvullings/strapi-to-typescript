@@ -1,6 +1,6 @@
 {
   "name": "strapi-to-typescript",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Convert the strapi models to typescript interfaces.",
   "main": "index.js",
   "bin": {
