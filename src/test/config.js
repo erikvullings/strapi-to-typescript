@@ -24,6 +24,7 @@ const config = {
                 type: "string"
             }
         ]
-    }
+    },
+    importAsType: false
 }
 module.exports = config;
