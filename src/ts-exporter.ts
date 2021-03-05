@@ -210,7 +210,7 @@ class Converter {
     const toImportDefinition = (name: string) => {
       const found = findModel(this.strapiModels, name);
       const toFolder = (f: IStrapiModelExtended) => (this.config.nested ? `../${f.snakeName}/${f.snakeName}` : `./${f.snakeName}`);
-      return found ? `import { ${found.interfaceName} } from '${toFolder(found)}';` : '';
+      return found ? `import ${(this.config.importAsType ? 'type ': '')}{ ${found.interfaceName} } from '${toFolder(found)}';` : '';
     };
 
     const imports: string[] = [];
