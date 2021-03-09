@@ -29,4 +29,6 @@ export interface IStrapiModel {
     timestamps: boolean;
   };
   attributes: { [attr: string]: IStrapiModelAttribute };
+  // not found inside model file, but can be determined from path
+  modelName: string;
 }

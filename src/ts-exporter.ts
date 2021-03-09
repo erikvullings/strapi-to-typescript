@@ -92,7 +92,7 @@ const util = {
 }
 
 const findModel = (structure: IStrapiModelExtended[], name: string): IStrapiModelExtended | undefined => {
-  return structure.filter((s) => s.name.toLowerCase() === name || s.snakeName === name).shift();
+  return structure.filter((s) => s.modelName === name).shift();
 };
 
 /**
@@ -102,6 +102,8 @@ const findModel = (structure: IStrapiModelExtended[], name: string): IStrapiMode
  */
 const componentCompatible = (attr: IStrapiModelAttribute) => {
   if (attr.type === 'component'){
+    // TODO: this fails for components which names are inherently plural, like "materials"
+    // component models need to be parsed to include nearest folder into model name, and this code will go away
     let model = singular(attr.component!.split('.')[1])
     return attr.repeatable ? { collection: model } : { model: model }
   }
@@ -207,8 +209,8 @@ class Converter {
    * @param structure Overall output structure
    */
   strapiModelExtractImports(m: IStrapiModelExtended) {
-    const toImportDefinition = (name: string) => {
-      const found = findModel(this.strapiModels, name);
+    const toImportDefinition = (modelName: string) => {
+      const found = findModel(this.strapiModels, modelName);
       const toFolder = (f: IStrapiModelExtended) => (this.config.nested ? `../${f.snakeName}/${f.snakeName}` : `./${f.snakeName}`);
       return found ? `import { ${found.interfaceName} } from '${toFolder(found)}';` : '';
     };

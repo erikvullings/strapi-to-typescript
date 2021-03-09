@@ -104,19 +104,26 @@ export const importFiles = (files: string[]) =>
         pending--;
 
         let strapiModel = Object.assign(JSON.parse(data), { _filename: f })
-        if (strapiModel.info && strapiModel.info.name) {
-          let sameNameIndex = names.indexOf(strapiModel.info.name);
-          if (sameNameIndex === -1) {
-            results.push(strapiModel);
-            names.push(strapiModel.info.name)
-          } else {
-            console.warn(`Already have model '${strapiModel.info.name}' => skip ${results[sameNameIndex]._filename} use ${strapiModel._filename}`)
-            results[sameNameIndex] = strapiModel;
-          }
-        } else {
+        // model name in strapiModel.info.name may be overridden by user
+        // at this point easy way is to determine it from file name
+        // like /extensions/users-permissions/models/User.settings.json - extract "user" (lowercase)
+        // or /api/rules/models/rules.settings.json - extract "rules"
+        // TODO: for components, parse nearest folder and include into modelName with dot. See ts-exporter.componentCompatible
+        const modelNameStep1 = f.slice(f.lastIndexOf('\\') + 1) //windows
+        const modelNameStep2 = modelNameStep1.slice(modelNameStep1.lastIndexOf('/') + 1) //linux
+        const modelName = modelNameStep2.slice(0, modelNameStep2.indexOf('.')).toLowerCase() //cut all extensions and to lowercase
+        strapiModel.modelName = modelName;
+        let sameNameIndex = names.indexOf(modelName);
+        if (sameNameIndex === -1) {
           results.push(strapiModel);
+          names.push(modelName)
+        } else if (f.indexOf('node_modules') === -1) {
+          // in case model is in node_modules and is overridden in code, priority to take from code
+          console.warn(`Already have model '${modelName}' => skip ${results[sameNameIndex]._filename} use ${strapiModel._filename}`)
+          results[sameNameIndex] = strapiModel;
+        } else {
+          console.warn(`Already have model '${modelName}' => use ${results[sameNameIndex]._filename} skip ${strapiModel._filename}`)
         }
-
         if (pending === 0) {
           resolve(results);
         }
