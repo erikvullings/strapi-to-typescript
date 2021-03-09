@@ -104,11 +104,11 @@ export const importFiles = (files: string[]) =>
         pending--;
 
         let strapiModel = Object.assign(JSON.parse(data), { _filename: f })
-        // model name in strapiModel.info.name may be overridden by user
-        // at this point easy way is to determine it from file name
-        // like /extensions/users-permissions/models/User.settings.json - extract "user" (lowercase)
-        // or /api/rules/models/rules.settings.json - extract "rules"
-        // TODO: for components, parse nearest folder and include into modelName with dot. See ts-exporter.componentCompatible
+        /* Model name in strapiModel.info.name may be overridden by user.
+          At this point easy way is to determine it from file name,
+          like /extensions/users-permissions/models/User.settings.json - extract "user" (lowercase)
+          or /api/rules/models/rules.settings.json - extract "rules" */
+        // TODO: for components, parse nearest folder and include into modelName with dot. See ts-exporter.componentCompatible for reason
         const modelNameStep1 = f.slice(f.lastIndexOf('\\') + 1) //windows
         const modelNameStep2 = modelNameStep1.slice(modelNameStep1.lastIndexOf('/') + 1) //linux
         const modelName = modelNameStep2.slice(0, modelNameStep2.indexOf('.')).toLowerCase() //cut all extensions and to lowercase
