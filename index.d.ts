@@ -46,7 +46,7 @@ export interface IConfigOptions extends ICommandOptions {
      * example:
      *      (name) => name.charAt(0).toUpperCase() + name.slice(1)
      */
-    interfaceName: (name: string) => string | undefined;
+    interfaceName: (name: string, filename: string) => string | undefined;
 
     /**
      * Model Strapi attributes name.

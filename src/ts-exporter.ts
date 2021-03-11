@@ -18,8 +18,8 @@ const util = {
   // InterfaceName
   defaultToInterfaceName: (name: string) => name ? `I${name.replace(/^./, (str: string) => str.toUpperCase()).replace(/[ ]+./g, (str: string) => str.trimLeft().toUpperCase()).replace(/\//g, '')}` : 'any',
   overrideToInterfaceName: undefined as IConfigOptions['interfaceName'] | undefined,
-  toInterfaceName(name: string) {
-    return util.overrideToInterfaceName ? util.overrideToInterfaceName(name) || util.defaultToInterfaceName(name) : this.defaultToInterfaceName(name);
+  toInterfaceName(name: string, filename: string) {
+    return util.overrideToInterfaceName ? util.overrideToInterfaceName(name, filename) || util.defaultToInterfaceName(name) : this.defaultToInterfaceName(name);
   },
 
   // EnumName
@@ -136,7 +136,7 @@ class Converter {
           .join('-')
           .replace(/[\/\- ]+/g, "-")
           .toLowerCase(),
-        interfaceName: util.toInterfaceName(m.info.name),
+        interfaceName: util.toInterfaceName(m.info.name, m._filename),
         modelName: path.basename(m._filename, '.settings.json')
       }
     });
