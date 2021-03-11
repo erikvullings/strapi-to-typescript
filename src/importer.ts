@@ -97,10 +97,11 @@ export const importFiles = (files: string[]) =>
     const results: IStrapiModel[] = [];
     const names: string[] = [];
 
-    files.forEach(f =>
-      fs.readFile(f, { encoding: 'utf8' }, (err, data) => {
+    files.forEach(f => {
 
-        if (err) reject(err);
+      try {
+        const data = fs.readFileSync(f, { encoding: 'utf8' });
+        
         pending--;
 
         let strapiModel = Object.assign(JSON.parse(data), { _filename: f })
@@ -120,6 +121,8 @@ export const importFiles = (files: string[]) =>
         if (pending === 0) {
           resolve(results);
         }
-      })
-    );
+      } catch (err) {
+        reject(err);
+      }
+    })
   });
