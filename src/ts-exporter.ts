@@ -5,9 +5,12 @@ import { IStrapiModel, IStrapiModelAttribute } from './models/strapi-model';
 import { IConfigOptions } from '..';
 
 interface IStrapiModelExtended extends IStrapiModel {
-  name: string;
+  // use to output filename
   snakeName: string;
+  // interface name
   interfaceName: string;
+  // model name extract from *.settings.json filename. Use to link model.
+  modelName: string;
 }
 
 const util = {
@@ -92,7 +95,7 @@ const util = {
 }
 
 const findModel = (structure: IStrapiModelExtended[], name: string): IStrapiModelExtended | undefined => {
-  return structure.filter((s) => s.name.toLowerCase() === name || s.snakeName === name).shift();
+  return structure.filter((s) => s.modelName.toLowerCase() === name.toLowerCase()).shift();
 };
 
 /**
@@ -128,13 +131,13 @@ class Converter {
     this.strapiModels = strapiModelsParse.map(m => {
       return {
         ...m,
-        name: m.info.name,
         snakeName: m.info.name
           .split(/(?=[A-Z])/)
           .join('-')
           .replace(/[\/\- ]+/g, "-")
           .toLowerCase(),
-        interfaceName: util.toInterfaceName(m.info.name)
+        interfaceName: util.toInterfaceName(m.info.name),
+        modelName: path.basename(m._filename, '.settings.json')
       }
     });
 
@@ -172,7 +175,7 @@ class Converter {
     if (result.length > 0) result.push('')
 
     result.push('/**');
-    result.push(` * Model definition for ${m.name}`);
+    result.push(` * Model definition for ${m.info.name}`);
     result.push(' */');
     result.push(`export interface ${m.interfaceName} {`);
 
@@ -217,7 +220,7 @@ class Converter {
     if (m.attributes) for (const aName in m.attributes) {
       if (!m.attributes.hasOwnProperty(aName)) continue;
       const a = componentCompatible(m.attributes[aName]);
-      if((a.collection || a.model) === m.name) continue;
+      if((a.collection || a.model) === m.modelName) continue;
 
       const proposedImport = toImportDefinition(a.collection || a.model || '')
       if (proposedImport) imports.push(proposedImport);
