@@ -64,6 +64,15 @@ export interface IConfigOptions extends ICommandOptions {
     excludeField: (interfaceName: string, fieldName: string) => boolean | undefined;
 
     /**
+     * Use `import type` in import statements in generated files.
+     * ()
+     * example:
+     *      (interfaceName) => true
+     *      (interfaceName) => interfaceName === 'MyInterface'
+     */
+    importAsType: (interfaceName: string) => boolean | undefined;
+
+    /**
      * add your fields on typescript interface.
      * example:
      *      () => [{ name: "created_by", type: "string" }, { name: "updated_by", type: "string" }]
