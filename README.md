@@ -95,7 +95,7 @@ const config = {
     fieldName: (fieldName) => fieldName.replace('_', ''),
     interfaceName: (name) => `X${name}`,
     enumName: (name, interfaceName) => `Enum${interfaceName}${name}`,
-
+    importAsType: (interfaceName) => interfaceName === 'MyInterfaceThatWantsToImportAsTypes' /* or just true */,
 }
 module.exports = config;
 ```

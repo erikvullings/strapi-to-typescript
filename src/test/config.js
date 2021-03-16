@@ -24,6 +24,7 @@ const config = {
                 type: "string"
             }
         ]
-    }
+    },
+    importAsType: (interfaceName) => interfaceName !== 'Xuser'
 }
 module.exports = config;
