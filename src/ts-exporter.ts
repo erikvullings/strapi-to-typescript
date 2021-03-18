@@ -62,7 +62,7 @@ const util = {
    * @param model Strapi type
    * @param enumm Use Enum type (or string literal types)
    */
-  defaultToPropertyType: (interfaceName: string, fieldName: string, model: IStrapiModelAttribute, enumm: boolean) => {
+  defaultToPropertyType: (interfaceName: string, fieldName: string, model: IStrapiModelAttribute, enumm: boolean): string => {
     const pt = model.type ? model.type.toLowerCase() : 'any';
     switch (pt) {
       case 'text':
@@ -86,8 +86,6 @@ const util = {
         return 'Blob';
       case 'json':
         return '{ [key: string]: any }';
-      case 'dynamiczone':
-        return 'any[]'
       case 'decimal':
       case 'float':
       case 'biginteger':
@@ -105,12 +103,12 @@ const util = {
     return this.overrideToPropertyType ? this.overrideToPropertyType(`${model.type}`, fieldName, interfaceName) || this.defaultToPropertyType(interfaceName, fieldName, model, enumm) : this.defaultToPropertyType(interfaceName, fieldName, model, enumm);
   },
 
-  defaultToPropertyname(fieldName: string){
+  defaultToPropertyName(fieldName: string){
     return fieldName
   },
   overrideToPropertyName: undefined as IConfigOptions['fieldName'] | undefined,
   toPropertyName(fieldName: string, interfaceName: string, ){
-    return this.overrideToPropertyName ? this.overrideToPropertyName(fieldName, interfaceName) || this.defaultToPropertyname(fieldName) : this.defaultToPropertyname(fieldName);
+    return this.overrideToPropertyName ? this.overrideToPropertyName(fieldName, interfaceName) || this.defaultToPropertyName(fieldName) : this.defaultToPropertyName(fieldName);
   },
 
 
@@ -270,6 +268,9 @@ class Converter {
 
       const proposedImport = toImportDefinition(a.collection || a.model || '')
       if (proposedImport) imports.push(proposedImport);
+
+      const proposedImports = (a.components || []).map(toImportDefinition);
+      if (proposedImports) imports.push(...proposedImports)
     }
 
     return imports
@@ -303,13 +304,16 @@ class Converter {
     a = componentCompatible(a);
     const collection = a.collection ? '[]' : '';
 
-    const propType = a.collection
-      ? findModelName(a.collection)
-      : a.model
-        ? findModelName(a.model)
-        : a.type
-          ? util.toPropertyType(interfaceName, name, a, this.config.enum)
-          : 'unknown';
+    let propType = 'unknown';
+    if (a.collection) {
+      propType = findModelName(a.collection);
+    } else if (a.model) {
+      propType = findModelName(a.model);
+    } else if (a.type === "dynamiczone") {
+      propType = `(${a.components!.map(findModelName).join("|")})[]`
+    } else if (a.type) {
+      propType = util.toPropertyType(interfaceName, name, a, this.config.enum)
+    }
 
     const fieldName = util.toPropertyName(name, interfaceName);
 
