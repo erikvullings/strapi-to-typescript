@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { singular } from 'pluralize'
 import { IStrapiModel, IStrapiModelAttribute } from './models/strapi-model';
 import { IConfigOptions } from '..';
 
@@ -15,11 +14,37 @@ interface IStrapiModelExtended extends IStrapiModel {
 
 const util = {
 
+  // SnakeName
+  toSnakeName(name: string) {
+    return name
+      .split(/(?=[A-Z])/)
+      .join('-')
+      .replace(/[\/\- ]+/g, "-")
+      .toLowerCase();
+  },
+
   // InterfaceName
-  defaultToInterfaceName: (name: string) => name ? `I${name.replace(/^./, (str: string) => str.toUpperCase()).replace(/[ ]+./g, (str: string) => str.trimLeft().toUpperCase()).replace(/\//g, '')}` : 'any',
+  modelToInterfaceName: (name: string) => name ? `${name.replace(/^./, (str: string) => str.toUpperCase()).replace(/[ ]+./g, (str: string) => str.trimLeft().toUpperCase()).replace(/\//g, '')}` : 'any',
+  componentToInterfaceName: (name: string) => name ? `${name.replace(/^./, (str: string) => str.toUpperCase()).replace(/[.\-]\w/g, (str: string) => str[1].toUpperCase()).replace(/[ ]+./g, (str: string) => str.trimLeft().toUpperCase()).replace(/\//g, '')}` : 'any',
   overrideToInterfaceName: undefined as IConfigOptions['interfaceName'] | undefined,
-  toInterfaceName(name: string, filename: string) {
-    return util.overrideToInterfaceName ? util.overrideToInterfaceName(name, filename) || util.defaultToInterfaceName(name) : this.defaultToInterfaceName(name);
+  toInterfaceName(kind: "model"|"component", name: string, filename: string) {
+    if (util.overrideToInterfaceName) {
+      const result = util.overrideToInterfaceName(name, filename);
+
+      if (result) {
+        return result
+      }
+    }
+
+    if (kind === "model") {
+      return this.modelToInterfaceName(name)
+    }
+
+    if (kind === "component") {
+      return this.componentToInterfaceName(name)
+    }
+
+    return ""
   },
 
   // EnumName
@@ -104,9 +129,8 @@ const findModel = (structure: IStrapiModelExtended[], name: string): IStrapiMode
  * @param attr IStrapiModelAttribute
  */
 const componentCompatible = (attr: IStrapiModelAttribute) => {
-  if (attr.type === 'component'){
-    let model = singular(attr.component!.split('.')[1])
-    return attr.repeatable ? { collection: model } : { model: model }
+  if (attr.type === 'component' && attr.component){
+    return attr.repeatable ? { collection: attr.component } : { model: attr.component }
   }
   return attr;
 }
@@ -115,8 +139,9 @@ const componentCompatible = (attr: IStrapiModelAttribute) => {
 class Converter {
 
   strapiModels: IStrapiModelExtended[] = [];
+  strapiComponents: IStrapiModelExtended[] = [];
 
-  constructor(strapiModelsParse: IStrapiModel[], private config: IConfigOptions) {
+  constructor(strapiModels: IStrapiModel[], strapiComponents: IStrapiModel[], private config: IConfigOptions) {
 
     if (!fs.existsSync(this.config.output)) fs.mkdirSync(this.config.output);
 
@@ -128,19 +153,23 @@ class Converter {
     if (config.addField && typeof config.addField === 'function') util.addField = config.addField;
     if (config.fieldName && typeof config.fieldName === 'function') util.overrideToPropertyName = config.fieldName;
 
-    this.strapiModels = strapiModelsParse.map(m => {
+    this.strapiModels = strapiModels.map(m => {
       return {
         ...m,
-        snakeName: m.info.name
-          .split(/(?=[A-Z])/)
-          .join('-')
-          .replace(/[\/\- ]+/g, "-")
-          .toLowerCase(),
-        interfaceName: util.toInterfaceName(m.info.name, m._filename),
+        snakeName: util.toSnakeName(m.info.name),
+        interfaceName: util.toInterfaceName("model", m.info.name, m._filename),
         modelName: path.basename(m._filename, '.settings.json')
       }
     });
 
+    this.strapiComponents = strapiComponents.map(c => {
+      return {
+        ...c,
+        snakeName: util.toSnakeName(c.info.name),
+        interfaceName: util.toInterfaceName("component", c.info.name, c._filename),
+        modelName: c._filename.split("/").slice(0, -1).pop() + "." + path.basename(c._filename, '.json')
+      }
+    });
   }
 
   async run() {
@@ -154,17 +183,34 @@ class Converter {
         .join('\n');
       fs.writeFileSync(outputFile, output + '\n');
 
-      // Write each interfaces
-      let count = this.strapiModels.length;
-      this.strapiModels.forEach(g => {
-        const folder = this.config.nested ? path.resolve(this.config.output, g.snakeName) : this.config.output;
-        if (!fs.existsSync(folder)) fs.mkdirSync(folder);
-        fs.writeFile(path.resolve(folder, `${g.snakeName}.ts`), this.strapiModelToInterface(g), { encoding: 'utf8' }, (err) => {
-          count--;
-          if (err) reject(err);
-          if (count === 0) resolve(this.strapiModels.length);
+      // Write each model interfaces
+      {
+        let count = this.strapiModels.length;
+        this.strapiModels.forEach(g => {
+          const folder = this.config.nested ? path.resolve(this.config.output, g.snakeName) : this.config.output;
+          if (!fs.existsSync(folder)) fs.mkdirSync(folder);
+          fs.writeFile(path.resolve(folder, `${g.snakeName}.ts`), this.strapiModelToInterface(g), { encoding: 'utf8' }, (err) => {
+            count--;
+            if (err) reject(err);
+            if (count === 0) resolve(this.strapiModels.length);
+          });
         });
-      });
+      }
+
+      // Write each component interfaces
+      {
+        let count = this.strapiComponents.length;
+        this.strapiComponents.forEach(g => {
+          const folder = this.config.nested ? path.resolve(this.config.output, g.snakeName) : this.config.output;
+          if (!fs.existsSync(folder)) fs.mkdirSync(folder);
+          fs.writeFile(path.resolve(folder, `${g.snakeName}.ts`), this.strapiModelToInterface(g), { encoding: 'utf8' }, (err) => {
+            count--;
+            if (err) reject(err);
+            if (count === 0) resolve(this.strapiModels.length);
+          });
+        });
+      }
+
     })
   }
 
@@ -211,7 +257,7 @@ class Converter {
    */
   strapiModelExtractImports(m: IStrapiModelExtended) {
     const toImportDefinition = (name: string) => {
-      const found = findModel(this.strapiModels, name);
+      const found = findModel(this.strapiModels, name) || findModel(this.strapiComponents, name);
       const toFolder = (f: IStrapiModelExtended) => (this.config.nested ? `../${f.snakeName}/${f.snakeName}` : `./${f.snakeName}`);
       return found ? `import ${((this.config.importAsType && this.config.importAsType(m.interfaceName)) ? 'type ': '')}{ ${found.interfaceName} } from '${toFolder(found)}';` : '';
     };
@@ -246,8 +292,10 @@ class Converter {
     a: IStrapiModelAttribute
   ) {
     const findModelName = (n: string) => {
-      const result = findModel(this.strapiModels, n);
-      if (!result && n !== '*') console.debug(`type '${n}' unknown on ${interfaceName}[${name}] => fallback to 'any'. Add in the input arguments the folder that contains *.settings.json with info.name === '${n}'`)
+      const result = findModel(this.strapiModels, n) || findModel(this.strapiComponents, n);
+      if (!result && n !== '*') {
+        console.debug(`type '${n}' unknown on ${interfaceName}[${name}] => fallback to 'any'. Add in the input arguments the folder that contains *.settings.json with info.name === '${n}'`)
+      }
       return result ? result.interfaceName : 'any';
     };
 
@@ -294,6 +342,6 @@ class Converter {
 /**
  * Export a StrapiModel to a TypeScript interface
  */
-export const convert = async (strapiModels: IStrapiModel[], config: IConfigOptions) => {
-  return new Converter(strapiModels, config).run()
+export const convert = async (strapiModels: IStrapiModel[], strapiComponents: IStrapiModel[], config: IConfigOptions) => {
+  return new Converter(strapiModels, strapiComponents, config).run()
 }

@@ -54,7 +54,7 @@ const walk = (
   });
 };
 
-export const findFiles = (dir: string, ext: RegExp = /.settings.json$/) =>
+export const findFiles = (dir: string, ext: RegExp = /(.json)$/) =>
   new Promise<string[]>((resolve, reject) => {
     const filter = (f: string) => ext.test(f);
     walk(
@@ -76,50 +76,68 @@ export const findFiles = (dir: string, ext: RegExp = /.settings.json$/) =>
  * 
  */
 export async function findFilesFromMultipleDirectories(...files: string[]): Promise<string[]> {
-  const inputs = [... new Set(files)]
+  let results: string[] = []
 
-  var actions = inputs.map(i => findFiles(i)); // run the function over all items
+  for (let input of files) {
+    const actions = await findFiles(input);
 
-  // we now have a promises array and we want to wait for it
+    results = [...actions, ...results];
+  }
 
-  var results = await Promise.all(actions); // pass array of promises
-
-  // flatten
-  return (new Array<string>()).concat.apply([], results)
+  return results
 }
 
 /*
  */
 export const importFiles = (files: string[]) =>
-  new Promise<IStrapiModel[]>((resolve, reject) => {
+  new Promise<{ components: IStrapiModel[], models: IStrapiModel[] }>((resolve, reject) => {
 
     let pending = files.length;
-    const results: IStrapiModel[] = [];
-    const names: string[] = [];
+
+    const models: IStrapiModel[] = [];
+    const modelNames: string[] = [];
+
+    const components: IStrapiModel[] = [];
+    const componentNames: string[] = [];
 
     files.forEach(f => {
-
       try {
         const data = fs.readFileSync(f, { encoding: 'utf8' });
         
         pending--;
 
         let strapiModel = Object.assign(JSON.parse(data), { _filename: f })
-        if (strapiModel.info && strapiModel.info.name) {
-          let sameNameIndex = names.indexOf(strapiModel.info.name);
+
+        if (strapiModel.info && strapiModel.info.name && strapiModel.collectionName && strapiModel.collectionName.startsWith("component")) {
+          const sameNameIndex = componentNames.indexOf(strapiModel.info.name);
+          const componentCollectionName = f.split("/").slice(0, -1).pop();
+          const componentModelName = f.split("/").pop()!.slice(0, -5);
           if (sameNameIndex === -1) {
-            results.push(strapiModel);
-            names.push(strapiModel.info.name)
+            components.push({
+              ...strapiModel,
+              info: {
+                ...strapiModel.info,
+                name: `${componentCollectionName}.${componentModelName}`
+              }
+            });
+            componentNames.push(strapiModel.info.name)
           } else {
-            console.warn(`Already have model '${strapiModel.info.name}' => skip ${results[sameNameIndex]._filename} use ${strapiModel._filename}`)
-            results[sameNameIndex] = strapiModel;
+            console.warn(`Already have component '${strapiModel.info.name}' => skip ${components[sameNameIndex]._filename} use ${strapiModel._filename}`)
+            components[sameNameIndex] = strapiModel;
           }
-        } else {
-          results.push(strapiModel);
+        } else if (strapiModel.info && strapiModel.info.name) {
+          const sameNameIndex = modelNames.indexOf(strapiModel.info.name);
+          if (sameNameIndex === -1) {
+            models.push(strapiModel);
+            modelNames.push(strapiModel.info.name)
+          } else {
+            console.warn(`Already have model '${strapiModel.info.name}' => skip ${models[sameNameIndex]._filename} use ${strapiModel._filename}`)
+            models[sameNameIndex] = strapiModel;
+          }
         }
 
         if (pending === 0) {
-          resolve(results);
+          resolve({ models, components });
         }
       } catch (err) {
         reject(err);

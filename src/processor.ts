@@ -12,10 +12,10 @@ export const exec = async (options: IConfigOptions) => {
     if(options.inputGroup) files.push(... await findFiles(options.inputGroup, /.json/));
 
     // parse files to object
-    const strapiModels = await importFiles(files);
+    const { models, components } = await importFiles(files);
 
     // build and write .ts
-    const count = await convert(strapiModels, options);
+    const count = await convert(models, components, options);
 
     log(`Generated ${count} interfaces.`);
   } catch (e){
