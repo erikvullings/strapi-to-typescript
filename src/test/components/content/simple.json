@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_content_simples",
+  "info": {
+    "name": "simple",
+    "icon": "angle-right"
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "text"
+    }
+  }
+}
