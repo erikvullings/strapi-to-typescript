@@ -31,9 +31,9 @@ const util = {
     if (util.overrideToInterfaceName) {
       const result = util.overrideToInterfaceName(name, filename);
 
-      if (result?.includes(".")) {
-        console.warn("Detected invalid toInterfaceName generated name, note component name can contain '.'.")
-        return result.replace(/./gi, '')
+      if (result?.includes(".") || result?.includes("_") || result?.includes("-")) {
+        console.warn("Detected invalid toInterfaceName generated name, note component name can contain '.', interface names may not contain '._-'.")
+        return result.replace(/[._-]/gi, '')
       }
 
       if (result) {

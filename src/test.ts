@@ -1,4 +1,8 @@
 import { Xfile, Xtestobject, Xtestobjectrelation, EnumXtestobjectenum_field } from './test/out';
+import {Xcontentcomplex} from "./test/out/content.complex";
+import {Xcontentsimple} from "./test/out/content.simple";
+import {Xcontentcamelcase} from "./test/out/content.camel-case";
+import {Xcontentanother} from "./test/out/content.another";
 
 // implementation of Xtestobject test required and type fields
 class XtestobjectXmpl implements Xtestobject {
@@ -24,6 +28,8 @@ class XtestobjectXmpl implements Xtestobject {
     json_field: { [key: string]: any; };
     uid_field: any;
     created_by: string;
+    single_dynamiczone?: [(Xcontentcomplex | Xcontentsimple | Xcontentcamelcase | Xcontentanother)];
+    repeatable_dynamiczone: (Xcontentcomplex | Xcontentsimple | Xcontentcamelcase | Xcontentanother)[];
 
     testobjectrelation?: Xtestobjectrelation;
     testobjectrelations: Xtestobjectrelation[];
@@ -46,6 +52,7 @@ class XtestobjectXmpl implements Xtestobject {
         this.created_by = "created_by";
 
         this.testobjectrelations = [];
+        this.repeatable_dynamiczone = [];
 
         // TOFXX => any field
 

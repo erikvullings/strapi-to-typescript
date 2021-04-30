@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_content_anothers",
+  "info": {
+    "name": "Just a Complete Other Name",
+    "icon": "angle-right"
+  },
+  "options": {},
+  "attributes": {
+    "reference": {
+      "model": "testobject"
+    }
+  }
+}

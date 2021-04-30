@@ -97,6 +97,26 @@
             "type": "uid",
             "required": true
         },
+        "single_dynamiczone": {
+          "type": "dynamiczone",
+          "repeatable": false,
+          "components": [
+            "content.complex",
+            "content.simple",
+            "content.camel-case",
+            "content.another"
+          ]
+        },
+        "repeatable_dynamiczone": {
+          "type": "dynamiczone",
+          "repeatable": true,
+          "components": [
+            "content.complex",
+            "content.simple",
+            "content.camel-case",
+            "content.another"
+          ]
+        },
         "testobjectrelation": {
             "via": "testobjects_one_many",
             "model": "testobjectrelation"
