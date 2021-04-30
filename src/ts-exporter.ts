@@ -31,6 +31,11 @@ const util = {
     if (util.overrideToInterfaceName) {
       const result = util.overrideToInterfaceName(name, filename);
 
+      if (result?.includes(".")) {
+        console.warn("Detected invalid toInterfaceName generated name, note component name can contain '.'.")
+        return result.replace(/./gi, '')
+      }
+
       if (result) {
         return result
       }

@@ -123,7 +123,13 @@ export const importFiles = (files: string[]) =>
             componentNames.push(strapiModel.info.name)
           } else {
             console.warn(`Already have component '${strapiModel.info.name}' => skip ${components[sameNameIndex]._filename} use ${strapiModel._filename}`)
-            components[sameNameIndex] = strapiModel;
+            components.push({
+              ...strapiModel,
+              info: {
+                ...strapiModel.info,
+                name: `${componentCollectionName}.${componentModelName}`
+              }
+            });
           }
         } else if (strapiModel.info && strapiModel.info.name) {
           const sameNameIndex = modelNames.indexOf(strapiModel.info.name);
