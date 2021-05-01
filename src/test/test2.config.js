@@ -4,18 +4,17 @@
 const config = {
     input: [
         'src/test/api/',
-        'src/test/strapi/'
+        'src/test/strapi/',
+        
     ],
-    output: 'src/test/out/',
+    inputGroup: 'src/test/components/content/',
+    output: 'src/test/out2/',
     enum: true,
-    fieldType: (fieldType) => { if(fieldType == 'datetime') return 'string'},
+    nested: true,
+    fieldType: (fieldType) => { if(fieldType === 'datetime') return 'string'},
     // fieldName: (fieldName) => fieldName.replace('_', '-'),
-    interfaceName(name){
-        return `X${name}`
-    },
-    enumName(name, interfaceName){
-        return `Enum${interfaceName}${name}`
-    },
+    // interfaceName: name => `X${name}`,
+    enumName: (name, interfaceName) =>`Enum${interfaceName}${name}`,
     excludeField: (interfaceName, fieldName) => fieldName === 'email_field',
     addField: (interfaceName) => {
         if(interfaceName === 'Xtestobject') return [

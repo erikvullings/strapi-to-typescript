@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_content_with_dashs",
+  "info": {
+    "name": "WithDash",
+    "icon": "angle-right"
+  },
+  "options": {},
+  "attributes": {
+    "reference": {
+      "model": "testobject"
+    }
+  }
+}

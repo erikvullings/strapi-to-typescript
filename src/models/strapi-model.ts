@@ -1,4 +1,4 @@
-export type StrapiType = 'string' | 'number' | 'boolean' | 'text' | 'date' | 'email' | 'component' | 'enumeration';
+export type StrapiType = 'string' | 'number' | 'boolean' | 'text' | 'date' | 'email' | 'component' | 'enumeration' | 'dynamiczone';
 
 export interface IStrapiModelAttribute {
   unique?: boolean;
@@ -12,12 +12,15 @@ export interface IStrapiModelAttribute {
   plugin?: string;
   enum?: string[];
   component?: string;
+  components?: string[];
   repeatable?: boolean;
 }
 
 export interface IStrapiModel {
   /** Not from Strapi, but is the filename on disk */
   _filename: string;
+  _isComponent?: boolean;
+
   connection: string;
   collectionName: string;
   info: {

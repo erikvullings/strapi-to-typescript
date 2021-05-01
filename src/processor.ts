@@ -6,19 +6,18 @@ const log = console.log;
 const logError = console.error;
 
 export const exec = async (options: IConfigOptions) => {
-  try{
+  try {
     // find *.settings.json
-    const files = await findFilesFromMultipleDirectories(...options.input);
-    if(options.inputGroup) files.push(... await findFiles(options.inputGroup, /.json/));
+    let strapiModels = await importFiles(await findFilesFromMultipleDirectories(...options.input));
 
-    // parse files to object
-    const strapiModels = await importFiles(files);
+    if (options.inputGroup)
+      strapiModels = await importFiles(await findFiles(options.inputGroup, /.json/), strapiModels, { _isComponent: true });
 
     // build and write .ts
     const count = await convert(strapiModels, options);
 
     log(`Generated ${count} interfaces.`);
-  } catch (e){
+  } catch (e) {
     logError(e)
   }
 };

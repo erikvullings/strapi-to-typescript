@@ -90,12 +90,10 @@ export async function findFilesFromMultipleDirectories(...files: string[]): Prom
 
 /*
  */
-export const importFiles = (files: string[]) =>
+export const importFiles = (files: string[], results:IStrapiModel[] = [], merge: Partial<IStrapiModel> = {}) =>
   new Promise<IStrapiModel[]>((resolve, reject) => {
 
     let pending = files.length;
-    const results: IStrapiModel[] = [];
-    const names: string[] = [];
 
     files.forEach(f => {
 
@@ -104,12 +102,12 @@ export const importFiles = (files: string[]) =>
         
         pending--;
 
-        let strapiModel = Object.assign(JSON.parse(data), { _filename: f })
+        let strapiModel = Object.assign(JSON.parse(data), { _filename: f, ...merge })
         if (strapiModel.info && strapiModel.info.name) {
-          let sameNameIndex = names.indexOf(strapiModel.info.name);
+          
+          let sameNameIndex = results.map(s => s.info.name).indexOf(strapiModel.info.name);
           if (sameNameIndex === -1) {
             results.push(strapiModel);
-            names.push(strapiModel.info.name)
           } else {
             console.warn(`Already have model '${strapiModel.info.name}' => skip ${results[sameNameIndex]._filename} use ${strapiModel._filename}`)
             results[sameNameIndex] = strapiModel;

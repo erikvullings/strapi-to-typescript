@@ -6,7 +6,7 @@ import { IConfigOptions } from '..';
 
 interface IStrapiModelExtended extends IStrapiModel {
   // use to output filename
-  snakeName: string;
+  ouputFile: string;
   // interface name
   interfaceName: string;
   // model name extract from *.settings.json filename. Use to link model.
@@ -80,12 +80,12 @@ const util = {
     return this.overrideToPropertyType ? this.overrideToPropertyType(`${model.type}`, fieldName, interfaceName) || this.defaultToPropertyType(interfaceName, fieldName, model, enumm) : this.defaultToPropertyType(interfaceName, fieldName, model, enumm);
   },
 
-  defaultToPropertyname(fieldName: string){
+  defaultToPropertyName(fieldName: string) {
     return fieldName
   },
   overrideToPropertyName: undefined as IConfigOptions['fieldName'] | undefined,
-  toPropertyName(fieldName: string, interfaceName: string, ){
-    return this.overrideToPropertyName ? this.overrideToPropertyName(fieldName, interfaceName) || this.defaultToPropertyname(fieldName) : this.defaultToPropertyname(fieldName);
+  toPropertyName(fieldName: string, interfaceName: string) {
+    return this.overrideToPropertyName ? this.overrideToPropertyName(fieldName, interfaceName) || this.defaultToPropertyName(fieldName) : this.defaultToPropertyName(fieldName);
   },
 
 
@@ -104,7 +104,7 @@ const findModel = (structure: IStrapiModelExtended[], name: string): IStrapiMode
  * @param attr IStrapiModelAttribute
  */
 const componentCompatible = (attr: IStrapiModelAttribute) => {
-  if (attr.type === 'component'){
+  if (attr.type === 'component') {
     let model = singular(attr.component!.split('.')[1])
     return attr.repeatable ? { collection: model } : { model: model }
   }
@@ -118,7 +118,7 @@ class Converter {
 
   constructor(strapiModelsParse: IStrapiModel[], private config: IConfigOptions) {
 
-    if (!fs.existsSync(this.config.output)) fs.mkdirSync(this.config.output);
+    if (!fs.existsSync(config.output)) fs.mkdirSync(config.output);
 
     if (config.enumName && typeof config.enumName === 'function') util.overrideToEnumName = config.enumName;
     if (config.interfaceName && typeof config.interfaceName === 'function') util.overrideToInterfaceName = config.interfaceName;
@@ -128,18 +128,24 @@ class Converter {
     if (config.addField && typeof config.addField === 'function') util.addField = config.addField;
     if (config.fieldName && typeof config.fieldName === 'function') util.overrideToPropertyName = config.fieldName;
 
-    this.strapiModels = strapiModelsParse.map(m => {
+    this.strapiModels = strapiModelsParse.map((m): IStrapiModelExtended => {
+      const modelName = m._isComponent ?
+        path.dirname(m._filename).split(path.sep).pop() + '.' + path.basename(m._filename, '.json')
+        : path.basename(m._filename, '.settings.json');
       return {
         ...m,
-        snakeName: m.info.name
-          .split(/(?=[A-Z])/)
-          .join('-')
-          .replace(/[\/\- ]+/g, "-")
-          .toLowerCase(),
+        // snakeName: m.info.name
+        //   .split(/(?=[A-Z])/)
+        //   .join('-')
+        //   .replace(/[\/\- ]+/g, "-")
+        //   .toLowerCase(),
         interfaceName: util.toInterfaceName(m.info.name, m._filename),
-        modelName: path.basename(m._filename, '.settings.json')
+        modelName,
+        ouputFile: m._isComponent ?
+          modelName.replace('.', path.sep) :
+          config.nested ? modelName + path.sep + modelName : modelName
       }
-    });
+    })
 
   }
 
@@ -148,8 +154,9 @@ class Converter {
 
       // Write index.ts
       const outputFile = path.resolve(this.config.output, 'index.ts');
+
       const output = this.strapiModels
-        .map(s => (this.config.nested ? `export * from './${s.snakeName}/${s.snakeName}';` : `export * from './${s.snakeName}';`))
+        .map(s => `export * from './${s.ouputFile}';`)
         .sort()
         .join('\n');
       fs.writeFileSync(outputFile, output + '\n');
@@ -157,9 +164,9 @@ class Converter {
       // Write each interfaces
       let count = this.strapiModels.length;
       this.strapiModels.forEach(g => {
-        const folder = this.config.nested ? path.resolve(this.config.output, g.snakeName) : this.config.output;
-        if (!fs.existsSync(folder)) fs.mkdirSync(folder);
-        fs.writeFile(path.resolve(folder, `${g.snakeName}.ts`), this.strapiModelToInterface(g), { encoding: 'utf8' }, (err) => {
+        const folder = path.resolve(this.config.output, g.ouputFile);
+        if (!fs.existsSync(path.dirname(folder))) fs.mkdirSync(path.dirname(folder));
+        fs.writeFile(`${folder}.ts`, this.strapiModelToInterface(g), { encoding: 'utf8' }, (err) => {
           count--;
           if (err) reject(err);
           if (count === 0) resolve(this.strapiModels.length);
@@ -212,18 +219,26 @@ class Converter {
   strapiModelExtractImports(m: IStrapiModelExtended) {
     const toImportDefinition = (name: string) => {
       const found = findModel(this.strapiModels, name);
-      const toFolder = (f: IStrapiModelExtended) => (this.config.nested ? `../${f.snakeName}/${f.snakeName}` : `./${f.snakeName}`);
-      return found ? `import ${((this.config.importAsType && this.config.importAsType(m.interfaceName)) ? 'type ': '')}{ ${found.interfaceName} } from '${toFolder(found)}';` : '';
+      const toFolder = (f: IStrapiModelExtended) => {
+          return this.config.nested || m._isComponent ? `../${f.ouputFile}` : `./${f.ouputFile}`;
+      }
+      return found ? `import ${(this.config.importAsType && this.config.importAsType(m.interfaceName) ? 'type ' : '')}{ ${found.interfaceName} } from '${toFolder(found)}';` : '';
     };
 
     const imports: string[] = [];
     if (m.attributes) for (const aName in m.attributes) {
+
       if (!m.attributes.hasOwnProperty(aName)) continue;
+      
       const a = componentCompatible(m.attributes[aName]);
-      if((a.collection || a.model) === m.modelName) continue;
+      if ((a.collection || a.model) === m.modelName) continue;
 
       const proposedImport = toImportDefinition(a.collection || a.model || '')
       if (proposedImport) imports.push(proposedImport);
+
+      imports.push(...(a.components || [])
+        .filter(c => c !== m.modelName)
+        .map(toImportDefinition));
     }
 
     return imports
@@ -255,17 +270,18 @@ class Converter {
     a = componentCompatible(a);
     const collection = a.collection ? '[]' : '';
 
-    const propType = a.collection
-      ? findModelName(a.collection)
-      : a.model
-        ? findModelName(a.model)
-        : a.type
-          ? util.toPropertyType(interfaceName, name, a, this.config.enum)
-          : 'unknown';
+    let propType = 'unknown';
+    if (a.collection) {
+      propType = findModelName(a.collection);
+    } else if (a.model) {
+      propType = findModelName(a.model);
+    } else if (a.type === "dynamiczone") {
+      propType = `(${a.components!.map(findModelName).join("|")})[]`
+    } else if (a.type) {
+      propType = util.toPropertyType(interfaceName, name, a, this.config.enum)
+    }
 
-    const fieldName = util.toPropertyName(name, interfaceName);
-
-    return `${fieldName}${required}: ${propType}${collection};`;
+    return `${util.toPropertyName(name, interfaceName)}${required}: ${propType}${collection};`;
   };
 
   /**

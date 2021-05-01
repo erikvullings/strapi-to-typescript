@@ -66,4 +66,4 @@ dist
 
 dist/
 
-src/test/out/
+src/test/out*/
