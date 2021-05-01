@@ -1,8 +1,8 @@
-import { IFile, ITestobject, ITestobjectrelation, EnumITestobjectenum_field } from './out';
-import { IComplex } from "./out/content/complex";
-import { ISimple } from "./out/content/simple";
-import { IWithDash } from "./out/content/camel-case";
-import { IJustACompleteOtherName } from "./out/content/another";
+import { IFile, ITestobject, ITestobjectrelation, EnumITestobjectenum_field } from './out2';
+import { IComplex } from "./out2/content/complex";
+import { ISimple } from "./out2/content/simple";
+import { IWithDash } from "./out2/content/camel-case";
+import { IJustACompleteOtherName } from "./out2/content/another";
 
 // implementation of Itestobject test required and type fields
 class ItestobjectImpl implements ITestobject {
