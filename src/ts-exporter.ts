@@ -29,6 +29,15 @@ const util = {
     return this.overrideToEnumName ? this.overrideToEnumName(name, interfaceName) || this.defaultToEnumName(name, interfaceName) : this.defaultToEnumName(name, interfaceName);
   },
 
+  // OutputFileName
+  defaultOutputFileName: (modelName: string, isComponent?: boolean, configNested?: boolean) => isComponent ?
+    modelName.replace('.', path.sep) :
+    configNested ? modelName.toLowerCase() + path.sep + modelName.toLowerCase() : modelName.toLowerCase(),
+  overrideOutputFileName: undefined as IConfigOptions['outputFileName'] | undefined,
+  toOutputFileName(modelName: string, isComponent: boolean | undefined, configNested: boolean | undefined, interfaceName: string, filename: string) {
+    return this.overrideOutputFileName ? this.overrideOutputFileName(interfaceName, filename) || this.defaultOutputFileName(modelName, isComponent, configNested) : this.defaultOutputFileName(modelName, isComponent, configNested);
+  },
+
   /**
    * Convert a Strapi type to a TypeScript type.
    *
@@ -80,9 +89,8 @@ const util = {
     return this.overrideToPropertyType ? this.overrideToPropertyType(`${model.type}`, fieldName, interfaceName) || this.defaultToPropertyType(interfaceName, fieldName, model, enumm) : this.defaultToPropertyType(interfaceName, fieldName, model, enumm);
   },
 
-  defaultToPropertyName(fieldName: string) {
-    return fieldName
-  },
+  // PropertyName
+  defaultToPropertyName: (fieldName: string) => fieldName,
   overrideToPropertyName: undefined as IConfigOptions['fieldName'] | undefined,
   toPropertyName(fieldName: string, interfaceName: string) {
     return this.overrideToPropertyName ? this.overrideToPropertyName(fieldName, interfaceName) || this.defaultToPropertyName(fieldName) : this.defaultToPropertyName(fieldName);
@@ -127,23 +135,20 @@ class Converter {
     if (config.excludeField && typeof config.excludeField === 'function') util.excludeField = config.excludeField;
     if (config.addField && typeof config.addField === 'function') util.addField = config.addField;
     if (config.fieldName && typeof config.fieldName === 'function') util.overrideToPropertyName = config.fieldName;
+    if (config.outputFileName && typeof config.outputFileName === 'function') util.overrideOutputFileName = config.outputFileName;
 
     this.strapiModels = strapiModelsParse.map((m): IStrapiModelExtended => {
+
       const modelName = m._isComponent ?
         path.dirname(m._filename).split(path.sep).pop() + '.' + path.basename(m._filename, '.json')
         : path.basename(m._filename, '.settings.json');
+      const interfaceName = util.toInterfaceName(m.info.name, m._filename);
+      const ouputFile = util.toOutputFileName(modelName, m._isComponent, config.nested, interfaceName, m._filename)
       return {
         ...m,
-        // snakeName: m.info.name
-        //   .split(/(?=[A-Z])/)
-        //   .join('-')
-        //   .replace(/[\/\- ]+/g, "-")
-        //   .toLowerCase(),
-        interfaceName: util.toInterfaceName(m.info.name, m._filename),
+        interfaceName,
         modelName,
-        ouputFile: m._isComponent ?
-          modelName.replace('.', path.sep) :
-          config.nested ? modelName + path.sep + modelName : modelName
+        ouputFile
       }
     })
 
@@ -220,7 +225,10 @@ class Converter {
     const toImportDefinition = (name: string) => {
       const found = findModel(this.strapiModels, name);
       const toFolder = (f: IStrapiModelExtended) => {
-          return this.config.nested || m._isComponent ? `../${f.ouputFile}` : `./${f.ouputFile}`;
+        let rel = path.normalize(path.relative(path.dirname(m.ouputFile), path.dirname(f.ouputFile)));
+        rel = path.normalize(rel + path.sep + path.basename(f.ouputFile))
+        if (!rel.startsWith('..')) rel = '.' + path.sep + rel;
+        return rel;
       }
       return found ? `import ${(this.config.importAsType && this.config.importAsType(m.interfaceName) ? 'type ' : '')}{ ${found.interfaceName} } from '${toFolder(found)}';` : '';
     };
@@ -229,7 +237,7 @@ class Converter {
     if (m.attributes) for (const aName in m.attributes) {
 
       if (!m.attributes.hasOwnProperty(aName)) continue;
-      
+
       const a = componentCompatible(m.attributes[aName]);
       if ((a.collection || a.model) === m.modelName) continue;
 

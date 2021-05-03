@@ -1,3 +1,5 @@
+const { interfaceName } = require('./test1.config');
+
 /**
  * @type {import('../../index').IConfigOptions}
  */
@@ -7,12 +9,12 @@ const config = {
         'src/test/strapi/'
     ],
     inputGroup: 'src/test/components/content/',
-    output: 'src/test/out1/',
+    output: 'src/test/out3/',
     enum: true,
-    nested: false,
     fieldType: (fieldType) => { if(fieldType === 'datetime') return 'string'},
     // fieldName: (fieldName) => fieldName.replace('_', '-'),
-    // interfaceName: name => `X${name}`,
+    interfaceName: name => `X${name}`.replace(/ /g, ''),
+    outputFileName: (interfaceName, filename) => filename.indexOf('test/components/content/') !== -1 ? `content/${interfaceName}` : interfaceName,
     enumName: (name, interfaceName) =>`Enum${interfaceName}${name}`,
     excludeField: (interfaceName, fieldName) => fieldName === 'email_field',
     addField: (interfaceName) => {

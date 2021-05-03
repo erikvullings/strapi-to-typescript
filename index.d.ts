@@ -26,10 +26,7 @@ export interface IConfigOptions extends ICommandOptions {
      *      (fieldType) => { if(fieldType == 'datetime') return 'string'}
      */
     fieldType: (fieldType: string, fieldName: string, interfaceName: string) => string | undefined;
-
-    /**
-     * @deprecated use fieldType
-     */
+    /** @deprecated use fieldType */
     type: (fieldType: string, fieldName: string, interfaceName: string) => string | undefined;
 
     /**
@@ -55,6 +52,11 @@ export interface IConfigOptions extends ICommandOptions {
      *      (name) => 'Enum' + name.charAt(0).toUpperCase() + name.slice(1)
      */
     enumName: (name: string, interfaceName: string) => string | undefined;
+
+    /**
+     * outputfile .ts path.
+     */
+    outputFileName: (interfaceName: string, filename: string) => string | undefined;
 
     /**
      * Exclude field on typescript interface.

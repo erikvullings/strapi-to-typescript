@@ -1,12 +1,12 @@
-import { ITestobject, ITestobjectrelation, EnumITestobjectenum_field } from './out1';
-import { IFile } from './out1/file'
-import { IComplex } from "./out1/content/complex";
-import { ISimple } from "./out1/content/simple";
-import { IWithDash } from "./out1/content/camel-case";
-import { IJustACompleteOtherName } from "./out1/content/another";
+import { Xtestobject, Xtestobjectrelation, EnumXtestobjectenum_field } from './out3';
+import { Xfile } from './out3/Xfile';
+import { Xcomplex } from "./out3/content/Xcomplex";
+import { Xsimple } from "./out3/content/Xsimple";
+import { XWithDash } from "./out3/content/XWithDash";
+import { XJustaCompleteOtherName } from "./out3/content/XJustaCompleteOtherName";
 
 // implementation of Itestobject test required and type fields
-class ItestobjectImpl implements ITestobject {
+class ItestobjectImpl implements Xtestobject {
     id: string;
 
     string_optional_field?: string;
@@ -23,17 +23,17 @@ class ItestobjectImpl implements ITestobject {
     boolean_field: boolean;
     email_field: string;
     password_field: string;
-    enum_field: EnumITestobjectenum_field;
+    enum_field: EnumXtestobjectenum_field;
     mulitple_media_field: any[];
-    single_media_field?: IFile;
+    single_media_field?: Xfile;
     json_field: { [key: string]: any; };
     uid_field: any;
     created_by: string;
-    single_dynamiczone?: [(IComplex | ISimple | IWithDash | IJustACompleteOtherName)];
-    repeatable_dynamiczone: (IComplex | ISimple | IWithDash | IJustACompleteOtherName)[];
+    single_dynamiczone?: [(Xcomplex | Xsimple | XWithDash | XJustaCompleteOtherName)];
+    repeatable_dynamiczone: (Xcomplex | Xsimple | XWithDash | XJustaCompleteOtherName)[];
 
-    testobjectrelation?: ITestobjectrelation;
-    testobjectrelations: ITestobjectrelation[];
+    testobjectrelation?: Xtestobjectrelation;
+    testobjectrelations: Xtestobjectrelation[];
 
     constructor() {
         this.id = "id"
@@ -48,7 +48,7 @@ class ItestobjectImpl implements ITestobject {
         this.boolean_field = true;
         this.email_field = "email_field";
         this.password_field = "password_field";
-        this.enum_field = EnumITestobjectenum_field.enum1;
+        this.enum_field = EnumXtestobjectenum_field.enum1;
         this.json_field = {};
         this.created_by = "created_by";
 
@@ -64,17 +64,17 @@ class ItestobjectImpl implements ITestobject {
     }
 }
 
-class ItestobjectrelationImpl implements ITestobjectrelation {
+class ItestobjectrelationImpl implements Xtestobjectrelation {
     id: string;
 
-    testobject_one_way?: ITestobject;
-    testobject_one_one?: ITestobject;
-    testobjects_one_many: ITestobject[];
-    testobject_many_one?: ITestobject;
-    testobjects_many_many: ITestobject[];
-    testobjects_poly: ITestobject[];
+    testobject_one_way?: Xtestobject;
+    testobject_one_one?: Xtestobject;
+    testobjects_one_many: Xtestobject[];
+    testobject_many_one?: Xtestobject;
+    testobjects_many_many: Xtestobject[];
+    testobjects_poly: Xtestobject[];
 
-    constructor(testobject: ITestobject) {
+    constructor(testobject: Xtestobject) {
         this.id = "id";
         this.testobjects_one_many = [testobject];
         this.testobjects_many_many = [testobject];

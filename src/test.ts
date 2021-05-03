@@ -17,7 +17,7 @@ async function execCmd(cmd: string) {
 async function runTest(file: string) {
     try {
         const testConf = require(`./test/${file}.config.js`)
-        if(testConf.output && (testConf.output as string).startsWith('src/test')){
+        if (testConf.output && (testConf.output as string).startsWith('src/test')) {
             await execCmd(`rm -rf ./${testConf.output}`)
         } else {
             console.error(`output of test '${file}' is wrong: ${testConf.output}`)
@@ -37,12 +37,12 @@ async function runTestSuite(files: string[]) {
     }
 }
 
-runTestSuite(
-    fs.readdirSync('./src/test')
-        .filter(f => /.config.js$/.test(f))
-        .map(f => f.replace('.config.js', ''))
-);
-
-
-
+if (process.argv.length > 2)
+    runTestSuite(process.argv.slice(2))
+else
+    runTestSuite(
+        fs.readdirSync('./src/test')
+            .filter(f => /.config.js$/.test(f))
+            .map(f => f.replace('.config.js', ''))
+    );
 

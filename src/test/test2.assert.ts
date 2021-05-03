@@ -1,4 +1,5 @@
-import { IFile, ITestobject, ITestobjectrelation, EnumITestobjectenum_field } from './out2';
+import { ITestobject, ITestobjectrelation, EnumITestobjectenum_field } from './out2';
+import { IFile } from './out2/file/file';
 import { IComplex } from "./out2/content/complex";
 import { ISimple } from "./out2/content/simple";
 import { IWithDash } from "./out2/content/camel-case";
