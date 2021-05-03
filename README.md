@@ -114,6 +114,22 @@ package.json
 }
 ```
 
+## Issue
+
+If you want to create an issue. First of all, be nice. Take the time to explain and format your post.
+
+The better solution to explain your issue (and for me, to fix it) is to create a pull request with your data:
+
+1. fork this repo with the button "fork" on github website. wait a minute.
+1. git clone your master branch from the newly created repository.
+1. `yarn install` or `npm install`
+1. add your api in `src/test/api` `src/test/components` (if necessary)
+1. add your test:
+  1. `src/test/test<issue id>.config.js` copy an other test and modify `output` conf
+  1. `src/test/test<issue id>.assert.ts` copy another assert and modify the import accordingly to your conf `output`
+1. run your test with `./node_modules/.bin/ts-node src/test.ts test<issue id>` or run all test `yarn test`
+1. create pull request on this repo
+
 ## Explanation
 
 The input folder is recursively processed and each model file is read. When done, the expected output folder is generated, and finally, the Strapi models are converted to TypeScript.
