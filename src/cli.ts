@@ -1,15 +1,10 @@
 const npmPackage = require('../package.json');
 import commandLineUsage from 'command-line-usage';
 import commandLineArgs from 'command-line-args';
-import { OptionDefinition } from 'command-line-args';
 import { exec } from './processor';
 import { ICommandOptions, IConfigOptions } from '..';
 import { resolve } from 'path'
 
-interface IOptionDefinition extends OptionDefinition {
-  typeLabel: string;
-  description: string;
-}
 
 function examplePath() {
   const pathToEx = `${__dirname}/.stsconfig.js`
@@ -18,12 +13,11 @@ function examplePath() {
 }
 
 export class CommandLineInterface {
-  public static optionDefinitions: IOptionDefinition[] = [
+  public static optionDefinitions: commandLineUsage.OptionDefinition[] = [
     {
       name: 'help',
       alias: 'h',
       type: Boolean,
-      typeLabel: '{underline Boolean}',
       description: 'Show help text.',
     },
     {
