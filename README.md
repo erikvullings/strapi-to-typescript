@@ -28,7 +28,7 @@ sts -c .stsconfig.js
 
 ### required
 * **input**  
-Strapi folder(s) with models *.settings.json
+Strapi folder(s)/file(s) with models *.settings.json
 You may define multiple inputs. In case your API models have relations to other plugins like 'users-permissions'.
 `sts path/to/strapi/api/ path/to/strapi/plugins/users-permissions/models -o path/to/your/types/dir/`  
 Order matters, if you have two models with the same name, the last one is used.

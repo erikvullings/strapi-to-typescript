@@ -1,7 +1,7 @@
 export interface ICommandOptions {
-    /** Strapi folder(s) with models */
+    /** Strapi folder(s)/file(s) with models (*.settings.json) */
     input: string[];
-    /** Strapi folder(s) with groups models */
+    /** Strapi folder(s) with groups models (*.json) */
     inputGroup: string;
     /** Output folder */
     output: string;

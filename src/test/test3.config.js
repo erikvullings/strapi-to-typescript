@@ -6,7 +6,8 @@ const { interfaceName } = require('./test1.config');
 const config = {
     input: [
         'src/test/api/',
-        'src/test/strapi/'
+        'src/test/strapi/strapi-plugin-upload/models/File.settings.json',
+        'src/test/strapi/strapi-plugin-users-permissions/models/User.settings.json'
     ],
     inputGroup: 'src/test/components/content/',
     output: 'src/test/out3/',
