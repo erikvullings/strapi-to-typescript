@@ -1,6 +1,6 @@
 {
   "name": "strapi-to-typescript",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "Convert the strapi models to typescript interfaces.",
   "main": "index.js",
   "bin": {
@@ -8,9 +8,11 @@
   },
   "scripts": {
     "start": "tsc -w",
-    "build": "rm -rf ./dist && tsc && cp ./src/.stsconfig.js ./dist",
+    "prebuild": "rm -rf ./dist",
+    "build": "tsc && cp ./src/.stsconfig.js ./dist",
     "patch-release": "npm version patch && tsc && npm publish && git push --follow-tags",
     "minor-release": "npm version minor && tsc && npm publish && git push --follow-tags",
+    "pretest": "rm -rf ./src/test/out*",
     "test": "ts-node src/test.ts",
     "test12": "ts-node src/test.ts test1 test2",
     "prepublishOnly": "npm run build && npm run test"
