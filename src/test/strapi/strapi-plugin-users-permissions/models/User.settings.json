@@ -51,6 +51,17 @@
       "via": "users",
       "plugin": "users-permissions",
       "configurable": false
+    },
+    "managees": {
+      "plugin": "users-permissions",
+      "collection": "user",
+      "via": "managers",
+      "dominant": true
+    },
+    "managers": {
+      "plugin": "users-permissions",
+      "collection": "user",
+      "via": "managees"
     }
   }
 }
