@@ -116,7 +116,10 @@ class Converter {
     if (config.enumName && typeof config.enumName === 'function') util.overrideToEnumName = config.enumName;
     if (config.interfaceName && typeof config.interfaceName === 'function') util.overrideToInterfaceName = config.interfaceName;
     if (config.fieldType && typeof config.fieldType === 'function') util.overrideToPropertyType = config.fieldType;
-    else if (config.type && typeof config.type === 'function') util.overrideToPropertyType = config.type;
+    else if (config.type && typeof config.type === 'function'){
+      console.warn("option 'type' is depreated. use 'fieldType'")
+      util.overrideToPropertyType = config.type;
+    }
     if (config.excludeField && typeof config.excludeField === 'function') util.excludeField = config.excludeField;
     if (config.addField && typeof config.addField === 'function') util.addField = config.addField;
     if (config.fieldName && typeof config.fieldName === 'function') util.overrideToPropertyName = config.fieldName;

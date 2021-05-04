@@ -7,7 +7,7 @@ const config = {
         'src/test/strapi/',
         
     ],
-    inputGroup: 'src/test/components/content/',
+    components: 'src/test/components/content/',
     output: 'src/test/out2/',
     enum: true,
     nested: true,

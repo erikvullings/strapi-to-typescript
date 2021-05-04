@@ -27,14 +27,20 @@ export class CommandLineInterface {
       multiple: true,
       typeLabel: '{underline String}',
       defaultOption: true,
-      description: 'Input folder with the Strapi models (api folder).',
+      description: 'Input folder with the Strapi models (*.settings.json)',
     },
     {
-      name: 'inputGroup',
+      name: 'components',
       alias: 'g',
       type: String,
       typeLabel: '{underline String}',
-      description: 'Input folder with the Strapi models (groups/components folder).'
+      description: 'Input folder with the Strapi components (*.json)'
+    },
+    {
+      name: 'inputGroup',
+      type: String,
+      typeLabel: '{underline String}',
+      description: 'Deprecated. use: -g --components'
     },
     {
       name: 'output',
@@ -49,31 +55,28 @@ export class CommandLineInterface {
       alias: 'c',
       type: String,
       typeLabel: '{underline String}',
-      description: 'Advanced configuration file.',
+      description: 'Advanced configuration file',
     },
     {
       name: 'nested',
       alias: 'n',
       type: Boolean,
-      typeLabel: '{underline Boolean}',
       defaultValue: false,
-      description: 'If true, add each interface in its own folder.',
+      description: 'add each interface in its own folder.',
     },
     {
       name: 'enum',
       alias: 'e',
       type: Boolean,
-      typeLabel: '{underline Boolean}',
       defaultValue: false,
-      description: 'If true, Enumeration is generate, else string literal types is used',
+      description: 'Enumeration is generate, else string literal types is used',
     },
     {
       name: 'collectionCanBeUndefined',
       alias: 'u',
       type: Boolean,
-      typeLabel: '{underline Boolean}',
       defaultValue: false,
-      description: 'If true, collection can be undefined',
+      description: 'collection can be undefined/optional',
     },
   ];
 
@@ -103,15 +106,19 @@ export class CommandLineInterface {
           example: '$ sts ./api -o ./sts',
         },
         {
-          desc: '03. Add each interface to its own folder.',
+          desc: '03. Convert the Strapi API folder with components and write the results to output folder.',
+          example: '$ sts ./api -g ./components -o ./sts',
+        },
+        {
+          desc: '04. Add each interface to its own folder.',
           example: '$ sts ./api -o ./sts -n',
         },
         {
-          desc: '04. Define multiple input folders.',
+          desc: '05. Define multiple input folders.',
           example: '$ sts ./api ./node_modules/strapi-plugin-users-permissions/models/ ./node_modules/strapi-plugin-upload/models/',
         },
         {
-          desc: `05. Use advanced configuration. See example: ${examplePath()}`,
+          desc: `06. Use advanced configuration. See example: ${examplePath()}`,
           example: '$ sts -c ./stsconfig.js',
         }
       ],

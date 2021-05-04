@@ -24,17 +24,17 @@ sts -c .stsconfig.js
 
 ## Command line option
 
-`sts input -g inputGroup -o output ...`
+`sts input -g components -o output ...`
 
 ### required
 * **input**  
-Strapi folder(s)/file(s) with models *.settings.json
+Strapi folder(s)/file(s) with models *.settings.json  
 You may define multiple inputs. In case your API models have relations to other plugins like 'users-permissions'.
 `sts path/to/strapi/api/ path/to/strapi/plugins/users-permissions/models -o path/to/your/types/dir/`  
 Order matters, if you have two models with the same name, the last one is used.
 
-* **-g inputGroup**  
-Strapi folder(s) with groups models
+* **-g components **  
+Strapi folder(s) with components models
 
 ### optional
 * **-o output**  
@@ -81,7 +81,7 @@ const config = {
       './node_modules/strapi-plugin-upload/models/',
       './extensions/users-permissions/models/'
     ],
-    inputGroup: './components/',
+    components: './components/',
     output: './sts/',
 
     // optional
