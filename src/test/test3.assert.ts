@@ -1,9 +1,22 @@
 import { Xtestobject, Xtestobjectrelation, EnumXtestobjectenum_field } from './out3';
 import { Xfile } from './out3/Xfile';
-import { Xcomplex } from "./out3/content/Xcomplex";
+import { Xcomplex, EnumXcomplexvariant } from "./out3/content/Xcomplex";
 import { Xsimple } from "./out3/content/Xsimple";
 import { XWithDash } from "./out3/content/XWithDash";
 import { XJustaCompleteOtherName } from "./out3/content/XJustaCompleteOtherName";
+
+class XcomplexImpl implements Xcomplex {
+    id: string;
+    variant?: EnumXcomplexvariant;
+    key?: string;
+    single?: Xcomplex | Xsimple;
+    repeatable: (Xcomplex | Xsimple)[];
+
+    constructor(){
+        this.id = "id";
+        this.repeatable = [];
+    }
+}
 
 // implementation of Itestobject test required and type fields
 class ItestobjectImpl implements Xtestobject {
@@ -29,7 +42,10 @@ class ItestobjectImpl implements Xtestobject {
     json_field: { [key: string]: any; };
     uid_field: any;
     created_by: string;
-    single_dynamiczone?: [(Xcomplex | Xsimple | XWithDash | XJustaCompleteOtherName)];
+    component_complex: Xcomplex;
+    component_complex_optional?: Xcomplex;
+    component_complex_repeatable:Xcomplex[];
+    single_dynamiczone?: Xcomplex | Xsimple | XWithDash | XJustaCompleteOtherName;
     repeatable_dynamiczone: (Xcomplex | Xsimple | XWithDash | XJustaCompleteOtherName)[];
 
     testobjectrelation?: Xtestobjectrelation;
@@ -61,6 +77,9 @@ class ItestobjectImpl implements Xtestobject {
         this.datetime_field = {};
         this.time_field = {};
         this.uid_field = {};
+
+        this.component_complex = new XcomplexImpl();
+        this.component_complex_repeatable = [];
     }
 }
 

@@ -1,9 +1,22 @@
 import { ITestobject, ITestobjectrelation, EnumITestobjectenum_field } from './out2';
 import { IFile } from './out2/file/file';
-import { IComplex } from "./out2/content/complex";
+import { IComplex, EnumIComplexvariant } from "./out2/content/complex";
 import { ISimple } from "./out2/content/simple";
 import { IWithDash } from "./out2/content/camel-case";
 import { IJustACompleteOtherName } from "./out2/content/another";
+
+class IComplexImpl implements IComplex {
+    id: string;
+    variant?: EnumIComplexvariant;
+    key?: string;
+    single?: IComplex | ISimple;
+    repeatable: (IComplex | ISimple)[];
+
+    constructor(){
+        this.id = "id";
+        this.repeatable = [];
+    }
+}
 
 // implementation of Itestobject test required and type fields
 class ItestobjectImpl implements ITestobject {
@@ -29,7 +42,10 @@ class ItestobjectImpl implements ITestobject {
     json_field: { [key: string]: any; };
     uid_field: any;
     created_by: string;
-    single_dynamiczone?: [(IComplex | ISimple | IWithDash | IJustACompleteOtherName)];
+    component_complex: IComplex;
+    component_complex_optional?: IComplex;
+    component_complex_repeatable:IComplex[];
+    single_dynamiczone?: IComplex | ISimple | IWithDash | IJustACompleteOtherName;
     repeatable_dynamiczone: (IComplex | ISimple | IWithDash | IJustACompleteOtherName)[];
 
     testobjectrelation?: ITestobjectrelation;
@@ -61,6 +77,9 @@ class ItestobjectImpl implements ITestobject {
         this.datetime_field = {};
         this.time_field = {};
         this.uid_field = {};
+
+        this.component_complex = new IComplexImpl();
+        this.component_complex_repeatable = [];
     }
 }
 

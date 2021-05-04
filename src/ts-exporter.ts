@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { singular } from 'pluralize'
 import { IStrapiModel, IStrapiModelAttribute } from './models/strapi-model';
 import { IConfigOptions } from '..';
 
@@ -105,20 +104,6 @@ const util = {
 const findModel = (structure: IStrapiModelExtended[], name: string): IStrapiModelExtended | undefined => {
   return structure.filter((s) => s.modelName.toLowerCase() === name.toLowerCase()).shift();
 };
-
-/**
- * Transform a Strapi Attribute of component.
- *
- * @param attr IStrapiModelAttribute
- */
-const componentCompatible = (attr: IStrapiModelAttribute) => {
-  if (attr.type === 'component') {
-    let model = singular(attr.component!.split('.')[1])
-    return attr.repeatable ? { collection: model } : { model: model }
-  }
-  return attr;
-}
-
 
 class Converter {
 
@@ -238,10 +223,10 @@ class Converter {
 
       if (!m.attributes.hasOwnProperty(aName)) continue;
 
-      const a = componentCompatible(m.attributes[aName]);
+      const a = m.attributes[aName];
       if ((a.collection || a.model) === m.modelName) continue;
 
-      const proposedImport = toImportDefinition(a.collection || a.model || '')
+      const proposedImport = toImportDefinition(a.collection || a.model || a.component || '')
       if (proposedImport) imports.push(proposedImport);
 
       imports.push(...(a.components || [])
@@ -275,16 +260,17 @@ class Converter {
     };
 
     const required = !a.required && !(!this.config.collectionCanBeUndefined && (a.collection || a.repeatable)) ? '?' : '';
-    a = componentCompatible(a);
-    const collection = a.collection ? '[]' : '';
+    const collection = a.collection || a.repeatable ? '[]' : '';
 
     let propType = 'unknown';
     if (a.collection) {
       propType = findModelName(a.collection);
+    } else if (a.component) {
+      propType = findModelName(a.component);
     } else if (a.model) {
       propType = findModelName(a.model);
     } else if (a.type === "dynamiczone") {
-      propType = `(${a.components!.map(findModelName).join("|")})[]`
+      propType = `(${a.components!.map(findModelName).join("|")})`
     } else if (a.type) {
       propType = util.toPropertyType(interfaceName, name, a, this.config.enum)
     }

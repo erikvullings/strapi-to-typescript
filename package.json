@@ -38,8 +38,7 @@
   "homepage": "https://github.com/erikvullings/strapi-to-typescript#readme",
   "dependencies": {
     "command-line-args": "^5.1.1",
-    "command-line-usage": "^5.0.5",
-    "pluralize": "^8.0.0"
+    "command-line-usage": "^5.0.5"
   },
   "devDependencies": {
     "@types/command-line-args": "^5.0.0",

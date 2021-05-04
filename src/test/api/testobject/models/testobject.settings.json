@@ -97,6 +97,24 @@
             "type": "uid",
             "required": true
         },
+        "component_complex_repeatable": {
+            "component": "content.complex",
+            "repeatable": true,
+            "type": "component",
+            "required": true
+        },
+        "component_complex_optional": {
+            "component": "content.complex",
+            "repeatable": false,
+            "type": "component",
+            "required": false
+        },
+        "component_complex": {
+            "component": "content.complex",
+            "repeatable": false,
+            "type": "component",
+            "required": true
+        },
         "single_dynamiczone": {
           "type": "dynamiczone",
           "repeatable": false,

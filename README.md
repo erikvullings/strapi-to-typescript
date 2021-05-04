@@ -140,3 +140,7 @@ The input folder is recursively processed and each model file is read. When done
 npm install && npm run build
 # output files generated in dist folder
 ```
+
+
+console warn deprecated
+template handlebrake/...
