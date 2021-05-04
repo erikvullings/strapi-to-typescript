@@ -149,7 +149,7 @@ class Converter {
       const outputFile = path.resolve(this.config.output, 'index.ts');
 
       const output = this.strapiModels
-        .map(s => `export * from './${s.ouputFile}';`)
+        .map(s => `export * from './${s.ouputFile.replace('\\', '/')}';`)
         .sort()
         .join('\n');
       fs.writeFileSync(outputFile, output + '\n');
@@ -216,7 +216,7 @@ class Converter {
         let rel = path.normalize(path.relative(path.dirname(m.ouputFile), path.dirname(f.ouputFile)));
         rel = path.normalize(rel + path.sep + path.basename(f.ouputFile))
         if (!rel.startsWith('..')) rel = '.' + path.sep + rel;
-        return rel;
+        return rel.replace('\\', '/').replace('\\', '/');
       }
       return found ? `import ${(this.config.importAsType && this.config.importAsType(m.interfaceName) ? 'type ' : '')}{ ${found.interfaceName} } from '${toFolder(found)}';` : '';
     };
