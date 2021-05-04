@@ -102,7 +102,7 @@ const util = {
 }
 
 const findModel = (structure: IStrapiModelExtended[], name: string): IStrapiModelExtended | undefined => {
-  return structure.filter((s) => s.modelName.toLowerCase() === name.toLowerCase()).shift();
+  return structure.filter((s) => s.modelName === name.toLowerCase()).shift();
 };
 
 class Converter {
@@ -116,8 +116,8 @@ class Converter {
     if (config.enumName && typeof config.enumName === 'function') util.overrideToEnumName = config.enumName;
     if (config.interfaceName && typeof config.interfaceName === 'function') util.overrideToInterfaceName = config.interfaceName;
     if (config.fieldType && typeof config.fieldType === 'function') util.overrideToPropertyType = config.fieldType;
-    else if (config.type && typeof config.type === 'function'){
-      console.warn("option 'type' is depreated. use 'fieldType'")
+    else if (config.type && typeof config.type === 'function') {
+      console.warn("option 'type' is depreated. use 'fieldType'");
       util.overrideToPropertyType = config.type;
     }
     if (config.excludeField && typeof config.excludeField === 'function') util.excludeField = config.excludeField;
@@ -135,7 +135,7 @@ class Converter {
       return {
         ...m,
         interfaceName,
-        modelName,
+        modelName: modelName.toLowerCase(),
         ouputFile
       }
     })
@@ -227,7 +227,7 @@ class Converter {
       if (!m.attributes.hasOwnProperty(aName)) continue;
 
       const a = m.attributes[aName];
-      if ((a.collection || a.model) === m.modelName) continue;
+      if ((a.collection || a.model || a.component) === m.modelName) continue;
 
       const proposedImport = toImportDefinition(a.collection || a.model || a.component || '')
       if (proposedImport) imports.push(proposedImport);
