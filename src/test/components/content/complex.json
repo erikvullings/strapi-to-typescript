@@ -18,16 +18,17 @@
       "regex": "\\w"
     },
     "single": {
-      "type": "dynamiczone",
+      "type": "component",
       "repeatable": false,
-      "components": [
-        "content.complex",
-        "content.simple"
-      ]
+      "component": "content.complex"
     },
     "repeatable": {
-      "type": "dynamiczone",
+      "type": "component",
       "repeatable": true,
+      "component": "content.complex"
+    },
+    "dynamic": {
+      "type": "dynamiczone",
       "components": [
         "content.complex",
         "content.simple"

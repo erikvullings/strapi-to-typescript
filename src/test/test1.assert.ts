@@ -4,18 +4,24 @@ import { EnumIComplexvariant, IComplex } from "./out1/content/complex";
 import { ISimple } from "./out1/content/simple";
 import { IWithDash } from "./out1/content/camel-case";
 import { IJustACompleteOtherName } from "./out1/content/another";
+import { DynamicZone } from './out1/dynamiczone';
 
 
 class IComplexImpl implements IComplex {
     id: string;
     variant?: EnumIComplexvariant;
     key?: string;
-    single?: IComplex | ISimple;
-    repeatable: (IComplex | ISimple)[];
+    single?: IComplex;
+    repeatable: IComplex[];
+    dynamic: (
+      | DynamicZone<'content.complex', IComplex>
+      | DynamicZone<'content.simple', ISimple>
+    )[];
 
     constructor(){
         this.id = "id";
         this.repeatable = [];
+        this.dynamic = [];
     }
 }
 
@@ -46,8 +52,12 @@ class ItestobjectImpl implements ITestobject {
     component_complex: IComplex;
     component_complex_optional?: IComplex;
     component_complex_repeatable:IComplex[];
-    single_dynamiczone?: IComplex | ISimple | IWithDash | IJustACompleteOtherName;
-    repeatable_dynamiczone: (IComplex | ISimple | IWithDash | IJustACompleteOtherName)[];
+    dynamiczone: (
+      | DynamicZone<'content.complex', IComplex>
+      | DynamicZone<'content.simple', ISimple>
+      | DynamicZone<'content.camel-case', IWithDash>
+      | DynamicZone<'content.another', IJustACompleteOtherName>
+    )[];
 
     testobjectrelation?: ITestobjectrelation;
     testobjectrelations: ITestobjectrelation[];
@@ -70,7 +80,7 @@ class ItestobjectImpl implements ITestobject {
         this.created_by = "created_by";
 
         this.testobjectrelations = [];
-        this.repeatable_dynamiczone = [];
+        this.dynamiczone = [];
 
         // TOFII => any field
 
