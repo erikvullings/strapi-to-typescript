@@ -4,7 +4,6 @@ import { EnumIComplexvariant, IComplex } from "./out1/content/complex";
 import { ISimple } from "./out1/content/simple";
 import { IWithDash } from "./out1/content/camel-case";
 import { IJustACompleteOtherName } from "./out1/content/another";
-import { DynamicZone } from './out1/dynamiczone';
 
 
 class IComplexImpl implements IComplex {
@@ -14,8 +13,8 @@ class IComplexImpl implements IComplex {
     single?: IComplex;
     repeatable: IComplex[];
     dynamic: (
-      | DynamicZone<'content.complex', IComplex>
-      | DynamicZone<'content.simple', ISimple>
+        | ({ __component: 'content.complex' } & IComplex)
+        | ({ __component: 'content.simple' } & ISimple)
     )[];
 
     constructor(){
@@ -53,10 +52,10 @@ class ItestobjectImpl implements ITestobject {
     component_complex_optional?: IComplex;
     component_complex_repeatable:IComplex[];
     dynamiczone: (
-      | DynamicZone<'content.complex', IComplex>
-      | DynamicZone<'content.simple', ISimple>
-      | DynamicZone<'content.camel-case', IWithDash>
-      | DynamicZone<'content.another', IJustACompleteOtherName>
+        | ({ __component: 'content.complex' } & IComplex)
+        | ({ __component: 'content.simple' } & ISimple)
+        | ({ __component: 'content.camel-case' } & IWithDash)
+        | ({ __component: 'content.another' } & IJustACompleteOtherName)
     )[];
 
     testobjectrelation?: ITestobjectrelation;

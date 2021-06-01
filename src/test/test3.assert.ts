@@ -4,7 +4,6 @@ import { Xcomplex, EnumXcomplexvariant } from "./out3/content/Xcomplex";
 import { Xsimple } from "./out3/content/Xsimple";
 import { XWithDash } from "./out3/content/XWithDash";
 import { XJustaCompleteOtherName } from "./out3/content/XJustaCompleteOtherName";
-import { DynamicZone } from './out3/dynamiczone';
 
 class XcomplexImpl implements Xcomplex {
     id: string;
@@ -13,8 +12,8 @@ class XcomplexImpl implements Xcomplex {
     single?: Xcomplex;
     repeatable: Xcomplex[];
     dynamic: (
-      | DynamicZone<'content.complex', Xcomplex>
-      | DynamicZone<'content.simple', Xsimple>
+        | ({ __component: 'content.complex' } & Xcomplex)
+        | ({ __component: 'content.simple' } & Xsimple)
     )[];
 
     constructor(){
@@ -52,10 +51,10 @@ class ItestobjectImpl implements Xtestobject {
     component_complex_optional?: Xcomplex;
     component_complex_repeatable:Xcomplex[];
     dynamiczone: (
-      | DynamicZone<'content.complex', Xcomplex>
-      | DynamicZone<'content.simple', Xsimple>
-      | DynamicZone<'content.camel-case', XWithDash>
-      | DynamicZone<'content.another', XJustaCompleteOtherName>
+        | ({ __component: 'content.complex' } & Xcomplex)
+        | ({ __component: 'content.simple' } & Xsimple)
+        | ({ __component: 'content.camel-case' } & XWithDash)
+        | ({ __component: 'content.another' } & XJustaCompleteOtherName)
     )[];
 
     testobjectrelation?: Xtestobjectrelation;

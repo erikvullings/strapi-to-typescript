@@ -154,14 +154,6 @@ class Converter {
         .join('\n');
       fs.writeFileSync(outputFile, output + '\n');
 
-      // Write dynamiczone.ts
-      const dynamiczoneFile = path.resolve(this.config.output, 'dynamiczone.ts');
-
-      const dynamiczoneOutput = `export type DynamicZone<C extends string, T> = {
-  __component: C;
-} & T;`;
-      fs.writeFileSync(dynamiczoneFile, dynamiczoneOutput + '\n');
-
       // Write each interfaces
       let count = this.strapiModels.length;
       this.strapiModels.forEach(g => {
@@ -245,12 +237,6 @@ class Converter {
         .map(toImportDefinition));
     }
 
-    if (Object.values(m.attributes).find(a => a.type === 'dynamiczone')) {
-      const dots = m.ouputFile.split('/').slice(1).fill('../').join('') || './';
-      const proposedImport = `import ${(this.config.importAsType && this.config.importAsType(m.interfaceName) ? 'type ' : '')}{ DynamicZone } from '${dots}dynamiczone';`;
-      imports.push(proposedImport);
-    }
-
     return imports
       .filter((value, index, arr) => arr.indexOf(value) === index) // is unique
       .sort()
@@ -278,7 +264,7 @@ class Converter {
     const buildDynamicZoneComponent = (n: string) => {
       const result = findModel(this.strapiModels, n);
       if (!result && n !== '*') console.debug(`type '${n}' unknown on ${interfaceName}[${name}] => fallback to 'any'. Add in the input arguments the folder that contains *.settings.json with info.name === '${n}'`)
-      return result ? `    | DynamicZone<'${result.modelName}', ${result.interfaceName}>\n` : 'any';
+      return result ? `    | ({ __component: '${result.modelName}' } & ${result.interfaceName})\n` : 'any';
     };
 
     const required = !a.required && !(!this.config.collectionCanBeUndefined && (a.collection || a.repeatable)) && a.type !== 'dynamiczone' ? '?' : '';
