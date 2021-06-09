@@ -261,8 +261,13 @@ class Converter {
       if (!result && n !== '*') console.debug(`type '${n}' unknown on ${interfaceName}[${name}] => fallback to 'any'. Add in the input arguments the folder that contains *.settings.json with info.name === '${n}'`)
       return result ? result.interfaceName : 'any';
     };
+    const buildDynamicZoneComponent = (n: string) => {
+      const result = findModel(this.strapiModels, n);
+      if (!result && n !== '*') console.debug(`type '${n}' unknown on ${interfaceName}[${name}] => fallback to 'any'. Add in the input arguments the folder that contains *.settings.json with info.name === '${n}'`)
+      return result ? `    | ({ __component: '${result.modelName}' } & ${result.interfaceName})\n` : 'any';
+    };
 
-    const required = !a.required && !(!this.config.collectionCanBeUndefined && (a.collection || a.repeatable)) ? '?' : '';
+    const required = !a.required && !(!this.config.collectionCanBeUndefined && (a.collection || a.repeatable)) && a.type !== 'dynamiczone' ? '?' : '';
     const collection = a.collection || a.repeatable ? '[]' : '';
 
     let propType = 'unknown';
@@ -273,7 +278,7 @@ class Converter {
     } else if (a.model) {
       propType = findModelName(a.model);
     } else if (a.type === "dynamiczone") {
-      propType = `(${a.components!.map(findModelName).join("|")})`
+      propType = `(\n${a.components!.map(buildDynamicZoneComponent).join('')}  )[]`
     } else if (a.type) {
       propType = util.toPropertyType(interfaceName, name, a, this.config.enum)
     }

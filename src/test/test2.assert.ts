@@ -9,12 +9,17 @@ class IComplexImpl implements IComplex {
     id: string;
     variant?: EnumIComplexvariant;
     key?: string;
-    single?: IComplex | ISimple;
-    repeatable: (IComplex | ISimple)[];
+    single?: IComplex;
+    repeatable: IComplex[];
+    dynamic: (
+        | ({ __component: 'content.complex' } & IComplex)
+        | ({ __component: 'content.simple' } & ISimple)
+    )[];
 
     constructor(){
         this.id = "id";
         this.repeatable = [];
+        this.dynamic = [];
     }
 }
 
@@ -45,8 +50,12 @@ class ItestobjectImpl implements ITestobject {
     component_complex: IComplex;
     component_complex_optional?: IComplex;
     component_complex_repeatable:IComplex[];
-    single_dynamiczone?: IComplex | ISimple | IWithDash | IJustACompleteOtherName;
-    repeatable_dynamiczone: (IComplex | ISimple | IWithDash | IJustACompleteOtherName)[];
+    dynamiczone: (
+        | ({ __component: 'content.complex' } & IComplex)
+        | ({ __component: 'content.simple' } & ISimple)
+        | ({ __component: 'content.camel-case' } & IWithDash)
+        | ({ __component: 'content.another' } & IJustACompleteOtherName)
+    )[];
 
     testobjectrelation?: ITestobjectrelation;
     testobjectrelations: ITestobjectrelation[];
@@ -69,7 +78,7 @@ class ItestobjectImpl implements ITestobject {
         this.created_by = "created_by";
 
         this.testobjectrelations = [];
-        this.repeatable_dynamiczone = [];
+        this.dynamiczone = [];
 
         // TOFII => any field
 

@@ -9,12 +9,17 @@ class XcomplexImpl implements Xcomplex {
     id: string;
     variant?: EnumXcomplexvariant;
     key?: string;
-    single?: Xcomplex | Xsimple;
-    repeatable: (Xcomplex | Xsimple)[];
+    single?: Xcomplex;
+    repeatable: Xcomplex[];
+    dynamic: (
+        | ({ __component: 'content.complex' } & Xcomplex)
+        | ({ __component: 'content.simple' } & Xsimple)
+    )[];
 
     constructor(){
         this.id = "id";
         this.repeatable = [];
+        this.dynamic = [];
     }
 }
 
@@ -45,8 +50,12 @@ class ItestobjectImpl implements Xtestobject {
     component_complex: Xcomplex;
     component_complex_optional?: Xcomplex;
     component_complex_repeatable:Xcomplex[];
-    single_dynamiczone?: Xcomplex | Xsimple | XWithDash | XJustaCompleteOtherName;
-    repeatable_dynamiczone: (Xcomplex | Xsimple | XWithDash | XJustaCompleteOtherName)[];
+    dynamiczone: (
+        | ({ __component: 'content.complex' } & Xcomplex)
+        | ({ __component: 'content.simple' } & Xsimple)
+        | ({ __component: 'content.camel-case' } & XWithDash)
+        | ({ __component: 'content.another' } & XJustaCompleteOtherName)
+    )[];
 
     testobjectrelation?: Xtestobjectrelation;
     testobjectrelations: Xtestobjectrelation[];
@@ -69,7 +78,7 @@ class ItestobjectImpl implements Xtestobject {
         this.created_by = "created_by";
 
         this.testobjectrelations = [];
-        this.repeatable_dynamiczone = [];
+        this.dynamiczone = [];
 
         // TOFII => any field
 

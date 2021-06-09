@@ -115,19 +115,8 @@
             "type": "component",
             "required": true
         },
-        "single_dynamiczone": {
+        "dynamiczone": {
           "type": "dynamiczone",
-          "repeatable": false,
-          "components": [
-            "content.complex",
-            "content.simple",
-            "content.camel-case",
-            "content.another"
-          ]
-        },
-        "repeatable_dynamiczone": {
-          "type": "dynamiczone",
-          "repeatable": true,
           "components": [
             "content.complex",
             "content.simple",
