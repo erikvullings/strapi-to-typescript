@@ -94,7 +94,7 @@ export const importFiles = (files: string[], results:IStrapiModel[] = [], merge:
   new Promise<IStrapiModel[]>((resolve, reject) => {
 
     let pending = files.length;
-
+    if(files.length === 0) resolve(results);
     files.forEach(f => {
 
       try {
