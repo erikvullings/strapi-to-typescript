@@ -184,9 +184,15 @@ class Converter {
       required: true
     })}`);
 
-    if (m.attributes) for (const aName in m.attributes) {
-      if ((util.excludeField && util.excludeField(m.interfaceName, aName)) || !m.attributes.hasOwnProperty(aName)) continue;
-      result.push(`  ${this.strapiModelAttributeToProperty(m.interfaceName, aName, m.attributes[aName])}`);
+    if (m.attributes) { 
+      for (const aName in m.attributes) {
+        if ((util.excludeField && util.excludeField(m.interfaceName, aName)) || !m.attributes.hasOwnProperty(aName)) continue;
+        result.push(`  ${this.strapiModelAttributeToProperty(m.interfaceName, aName, m.attributes[aName])}`);
+      }
+      if (m.options && m.options.timestamps) {
+        result.push(`  created_at?: Date;`);
+        result.push(`  updated_at?: Date;`);
+      }
     }
 
     if (util.addField) {
