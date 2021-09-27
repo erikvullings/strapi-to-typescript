@@ -227,7 +227,7 @@ class Converter {
       if (!m.attributes.hasOwnProperty(aName)) continue;
 
       const a = m.attributes[aName];
-      if ((a.collection || a.model || a.component) === m.modelName) continue;
+      if ((a.collection || a.model || a.component || '').toLowerCase() === m.modelName) continue;
 
       const proposedImport = toImportDefinition(a.collection || a.model || a.component || '')
       if (proposedImport) imports.push(proposedImport);

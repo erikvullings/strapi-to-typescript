@@ -33,7 +33,7 @@ You may define multiple inputs. In case your API models have relations to other 
 `sts path/to/strapi/api/ path/to/strapi/plugins/users-permissions/models -o path/to/your/types/dir/`  
 Order matters, if you have two models with the same name, the last one is used.
 
-* **-g components **  
+* **-g components**  
 Strapi folder(s) with components models
 
 ### optional
@@ -140,7 +140,3 @@ The input folder is recursively processed and each model file is read. When done
 npm install && npm run build
 # output files generated in dist folder
 ```
-
-
-console warn deprecated
-template handlebrake/...
