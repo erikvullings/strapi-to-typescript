@@ -4,7 +4,8 @@
 const config = {
     input: [
         'src/test/api/',
-        'src/test/strapi/'
+        'src/test/strapi/',
+        '!src/test/strapi/strapi-plugin-users-permissions'
     ],
     components: 'src/test/components/content/',
     output: 'src/test/out1/',
