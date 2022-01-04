@@ -103,6 +103,10 @@ export const importFiles = (files: string[], results: IStrapiModel[] = [], merge
         pending--;
 
         let strapiModel = Object.assign(JSON.parse(data), { _filename: f, ...merge })
+
+        if(strapiModel.info && !strapiModel.info.name && strapiModel.info.displayName)
+          strapiModel.info.name = strapiModel.info.displayName;
+        
         if (strapiModel.info && strapiModel.info.name) {
 
           let sameNameIndex = results.map(s => s.info.name).indexOf(strapiModel.info.name);
