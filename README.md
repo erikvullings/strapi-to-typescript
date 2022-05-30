@@ -6,6 +6,13 @@
 <span><a href="https://github.com/erikvullings/strapi-to-typescript/" title="View this project on Github"><img src="https://img.shields.io/github/contributors/erikvullings/strapi-to-typescript" alt="contributors" /></a></span>
 
 
+
+THIS PROJECT IS NOT MAINTAINED ANYMORE. Don't hesitate to fork it.  
+
+THIS PROJECT DOESN'T SUPPORT VERSION 4 OR LATER OF STRAPI. (see [PR#49](https://github.com/erikvullings/strapi-to-typescript/issues/49))  
+
+## 
+
 Convert the Strapi models to TypeScript interfaces by processing each of the `./api/**/models/*.settings.json` recursively.
 
 ## Install and Run
